@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "926919826903",
+    "project_id": "gliders-a4543",
+    "storage_bucket": "gliders-a4543.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:926919826903:android:bb227a7930664b7a7fbf92",
+        "android_client_info": {
+          "package_name": "com.codeyzx.gliders"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "926919826903-hguknrh5thciq664k1qf6e7m5sh39rjs.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.codeyzx.gliders",
+            "certificate_hash": "3028931c67458f3f1554eaf85ca53b3638f31d8f"
+          }
+        },
+        {
+          "client_id": "926919826903-knitae9i4fsogehvo7l8is79dosj80bi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCw6gRAGCMWsUcpAnCo0jQ7SMoVo9AarvI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "926919826903-knitae9i4fsogehvo7l8is79dosj80bi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
