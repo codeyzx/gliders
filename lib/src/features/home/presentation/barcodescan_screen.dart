@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gliders/src/features/home/presentation/cages_scan_screen.dart';
+import 'package:gliders/src/features/cages/presentation/cages_detail_screen.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 class BarcodescanScreen extends StatefulWidget {
@@ -40,7 +40,7 @@ class _BarcodescanScreenState extends State<BarcodescanScreen> with SingleTicker
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => CagesScanScreen(id: barcode.rawValue.toString()),
+                          builder: (context) => CagesDetailScreen(id: barcode.rawValue.toString()),
                         ));
                   }
                 },
