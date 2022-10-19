@@ -3,13 +3,34 @@ import 'package:flutter/material.dart';
 import 'package:gliders/src/features/home/widgets/indicator.dart';
 
 class Chart extends StatefulWidget {
-  const Chart({super.key});
+  final double koloniLength;
+  final double soloLength;
+  final double totalLength;
+  final double ipLength;
+  final double othersLength;
+  final String koloniPercentage;
+  final String soloPercentage;
+  final String ipPercentage;
+  final String othersPercentage;
+
+  const Chart({
+    Key? key,
+    required this.koloniLength,
+    required this.soloLength,
+    required this.totalLength,
+    required this.ipLength,
+    required this.othersLength,
+    required this.koloniPercentage,
+    required this.soloPercentage,
+    required this.ipPercentage,
+    required this.othersPercentage,
+  }) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => ChartState();
 }
 
-class ChartState extends State {
+class ChartState extends State<Chart> {
   int touchedIndex = -1;
 
   @override
@@ -43,7 +64,15 @@ class ChartState extends State {
                     ),
                     sectionsSpace: 0,
                     centerSpaceRadius: 35,
-                    sections: showingSections(),
+                    sections: showingSections(
+                        koloniPercentage: widget.koloniPercentage,
+                        soloPercentage: widget.soloPercentage,
+                        ipPercentage: widget.ipPercentage,
+                        othersPercentage: widget.othersPercentage,
+                        koloniLength: widget.koloniLength,
+                        soloLength: widget.soloLength,
+                        ipLength: widget.ipLength,
+                        othersLength: widget.othersLength),
                   ),
                 ),
               ),
@@ -54,7 +83,7 @@ class ChartState extends State {
               children: const <Widget>[
                 Indicator(
                   color: Color(0xff0293ee),
-                  text: 'First',
+                  text: 'Koloni',
                   isSquare: true,
                 ),
                 SizedBox(
@@ -62,7 +91,7 @@ class ChartState extends State {
                 ),
                 Indicator(
                   color: Color(0xfff8b250),
-                  text: 'Second',
+                  text: 'Solo',
                   isSquare: true,
                 ),
                 SizedBox(
@@ -70,15 +99,15 @@ class ChartState extends State {
                 ),
                 Indicator(
                   color: Color(0xff845bef),
-                  text: 'Third',
+                  text: 'IP',
                   isSquare: true,
                 ),
                 SizedBox(
                   height: 4,
                 ),
                 Indicator(
-                  color: Color(0xff13d38e),
-                  text: 'Fourth',
+                  color: Colors.grey,
+                  text: 'Others',
                   isSquare: true,
                 ),
               ],
@@ -92,7 +121,15 @@ class ChartState extends State {
     );
   }
 
-  List<PieChartSectionData> showingSections() {
+  List<PieChartSectionData> showingSections(
+      {required String koloniPercentage,
+      required String soloPercentage,
+      required String ipPercentage,
+      required String othersPercentage,
+      required double koloniLength,
+      required double soloLength,
+      required double ipLength,
+      required double othersLength}) {
     return List.generate(4, (i) {
       final isTouched = i == touchedIndex;
       final fontSize = isTouched ? 25.0 : 16.0;
@@ -101,8 +138,8 @@ class ChartState extends State {
         case 0:
           return PieChartSectionData(
             color: const Color(0xff0293ee),
-            value: 40,
-            title: '40%',
+            value: koloniLength.toDouble(),
+            title: '$koloniPercentage%',
             radius: radius,
             titleStyle: TextStyle(
               fontSize: fontSize,
@@ -113,8 +150,8 @@ class ChartState extends State {
         case 1:
           return PieChartSectionData(
             color: const Color(0xfff8b250),
-            value: 30,
-            title: '30%',
+            value: soloLength.toDouble(),
+            title: '$soloPercentage%',
             radius: radius,
             titleStyle: TextStyle(
               fontSize: fontSize,
@@ -125,8 +162,8 @@ class ChartState extends State {
         case 2:
           return PieChartSectionData(
             color: const Color(0xff845bef),
-            value: 15,
-            title: '15%',
+            value: ipLength.toDouble(),
+            title: '$ipPercentage%',
             radius: radius,
             titleStyle: TextStyle(
               fontSize: fontSize,
@@ -136,9 +173,9 @@ class ChartState extends State {
           );
         case 3:
           return PieChartSectionData(
-            color: const Color(0xff13d38e),
-            value: 15,
-            title: '15%',
+            color: Colors.grey,
+            value: othersLength.toDouble(),
+            title: '$othersPercentage%',
             radius: radius,
             titleStyle: TextStyle(
               fontSize: fontSize,

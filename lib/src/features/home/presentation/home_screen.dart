@@ -3,10 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gliders/src/features/auth/presentation/auth_controller.dart';
 import 'package:gliders/src/features/cages/presentation/cages_detail_screen.dart';
 import 'package:gliders/src/features/cages/presentation/cages_screen.dart';
+import 'package:gliders/src/features/history/presentation/history_controller.dart';
+import 'package:gliders/src/features/history/presentation/history_screen.dart';
 import 'package:gliders/src/features/home/presentation/barcodescan_screen.dart';
 import 'package:gliders/src/features/home/presentation/cages_controller.dart';
 import 'package:gliders/src/features/home/widgets/chart.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hexcolor/hexcolor.dart';
+import 'package:intl/intl.dart';
+import 'package:just_the_tooltip/just_the_tooltip.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   static const routeName = 'home';
@@ -27,51 +32,40 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Future<void> initProducts() async {
     await ref.read(cagesControllerProvider.notifier).getData();
+    await ref.read(historyControllerProvider.notifier).getData();
   }
 
   @override
   Widget build(BuildContext context) {
     final users = ref.watch(authControllerProvider);
     final cages = ref.watch(cagesControllerProvider);
+    final history = ref.watch(historyControllerProvider);
 
-    List<Map<String, dynamic>> popularNearby = [
-      {
-        "place": "Kandang 1",
-        "location": "Solo",
-        "imgPic":
-            "https://e7.pngegg.com/pngimages/627/546/png-clipart-dog-crate-puppy-kennel-pet-cage-animals-cage-thumbnail.png",
-      },
-      {
-        "place": "Kandang 2",
-        "location": "Koloni",
-        "imgPic": "https://www.olaolalombok.com/wp-content/uploads/2017/06/atuh-beach-nusa-penida-03947.jpg",
-      },
-      {
-        "place": "Kandang 3",
-        "location": "IP",
-        "imgPic":
-            "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Kuta_Beach_%286924448550%29.jpg/1200px-Kuta_Beach_%286924448550%29.jpg",
+    final koloniLength = ref.read(cagesControllerProvider.notifier).koloniLength;
+    final soloLength = ref.read(cagesControllerProvider.notifier).soloLength;
+    final ipLength = ref.read(cagesControllerProvider.notifier).ipLength;
+    final othersLength = ref.read(cagesControllerProvider.notifier).othersLength;
+    final totalLength = ref.read(cagesControllerProvider.notifier).cagesLength;
+
+    final koloniPercentage = (koloniLength / totalLength * 100).toStringAsFixed(0);
+    final soloPercentage = (soloLength / totalLength * 100).toStringAsFixed(0);
+    final ipPercentage = (ipLength / totalLength * 100).toStringAsFixed(0);
+    final othersPercentage = (othersLength / totalLength * 100).toStringAsFixed(0);
+
+    String checkTime() {
+      final now = DateTime.now();
+      final hour = DateFormat('kk').format(now);
+      final intHour = int.parse(hour);
+      if (intHour >= 4 && intHour < 11) {
+        return 'Good morning,';
+      } else if (intHour >= 11 && intHour < 15) {
+        return 'Good afternoon,';
+      } else if (intHour >= 15 && intHour < 18) {
+        return 'Good evening,';
+      } else {
+        return 'Good night,';
       }
-    ];
-
-    List<Map<String, String>> recomendation = [
-      {
-        "place": "Kuta Beach",
-        "location": "Bali, Indonesia",
-        "imgPic":
-            "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Kuta_Beach_%286924448550%29.jpg/1200px-Kuta_Beach_%286924448550%29.jpg",
-      },
-      {
-        "place": "Ubud Villa",
-        "location": "Bali, Indonesia",
-        "imgPic": "https://www.ubudvillasrental.com/wp-content/uploads/2019/02/01-Ubud-Villas-Rental-Villa-Bayad-Header.jpg",
-      },
-      {
-        "place": "Nusa Penida Beach",
-        "location": "Bali, Indonesia",
-        "imgPic": "https://www.olaolalombok.com/wp-content/uploads/2017/06/atuh-beach-nusa-penida-03947.jpg",
-      },
-    ];
+    }
 
     List menus = [
       {
@@ -97,7 +91,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async {
-            // await ref.read(cagesControllerProvider.notifier).getData();
+            await ref.read(cagesControllerProvider.notifier).getData();
           },
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
@@ -110,7 +104,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 Container(
                   width: double.infinity,
                   height: 80,
-                  color: Colors.transparent,
+                  color: HexColor('#F2FEFF'),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Row(
@@ -137,7 +131,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             //Lokasi User
                             //
                             Text(
-                              "Good morning,",
+                              checkTime(),
                               style: GoogleFonts.poppins(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w300,
@@ -175,7 +169,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Chart(),
+                Chart(
+                    koloniLength: koloniLength.toDouble(),
+                    soloLength: soloLength.toDouble(),
+                    totalLength: totalLength.toDouble(),
+                    ipLength: ipLength.toDouble(),
+                    othersLength: othersLength.toDouble(),
+                    koloniPercentage: koloniPercentage,
+                    soloPercentage: soloPercentage,
+                    ipPercentage: ipPercentage,
+                    othersPercentage: othersPercentage),
                 const SizedBox(height: 30),
                 //
                 //Card suggest
@@ -352,115 +355,225 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                   ],
                 ),
-                //
-                //Card Recomendation
-                //
-                // Padding(
-                //   padding: const EdgeInsets.only(left: 8.0),
-                //   child: Column(
-                //     crossAxisAlignment: CrossAxisAlignment.start,
-                //     children: [
-                //       Padding(
-                //         padding: const EdgeInsets.only(right: 8.0),
-                //         child: Row(
-                //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //           children: [
-                //             const Text(
-                //               "Recomendation",
-                //               style: TextStyle(
-                //                 fontWeight: FontWeight.bold,
-                //                 fontSize: 20,
-                //               ),
-                //             ),
-                //             TextButton(
-                //               onPressed: () {
-                //                 final glidersLength = ref.read(cagesControllerProvider.notifier).glidersLength;
-                //                 Logger().i(glidersLength);
-                //               },
-                //               child: const Text(
-                //                 "See More",
-                //                 style: TextStyle(
-                //                   fontSize: 16,
-                //                   color: Colors.green,
-                //                 ),
-                //               ),
-                //             )
-                //           ],
-                //         ),
-                //       ),
-                //       const SizedBox(height: 10),
-                //       SingleChildScrollView(
-                //         scrollDirection: Axis.horizontal,
-                //         child: Row(
-                //           crossAxisAlignment: CrossAxisAlignment.start,
-                //           children: recomendation
-                //               .map(
-                //                 (e) => SizedBox(
-                //                   width: 300,
-                //                   child: Card(
-                //                     shape: RoundedRectangleBorder(
-                //                       borderRadius: BorderRadius.circular(15.0),
-                //                     ),
-                //                     child: IntrinsicHeight(
-                //                       child: Padding(
-                //                         padding: const EdgeInsets.all(12.0),
-                //                         child: Row(
-                //                           children: [
-                //                             Container(
-                //                               height: 100,
-                //                               width: 100,
-                //                               decoration: BoxDecoration(
-                //                                 borderRadius: BorderRadius.circular(10),
-                //                                 color: Colors.cyan,
-                //                                 image: DecorationImage(
-                //                                   image: NetworkImage(
-                //                                     e["imgPic"]!,
-                //                                   ),
-                //                                   fit: BoxFit.cover,
-                //                                 ),
-                //                               ),
-                //                             ),
-                //                             Padding(
-                //                               padding: const EdgeInsets.all(8.0),
-                //                               child: Column(
-                //                                 crossAxisAlignment: CrossAxisAlignment.start,
-                //                                 children: [
-                //                                   Text(
-                //                                     e["place"]!,
-                //                                     style: const TextStyle(
-                //                                       fontWeight: FontWeight.bold,
-                //                                     ),
-                //                                   ),
-                //                                   const SizedBox(height: 5),
-                //                                   Row(
-                //                                     children: [
-                //                                       const Icon(
-                //                                         Icons.map,
-                //                                         size: 15,
-                //                                         color: Colors.grey,
-                //                                       ),
-                //                                       Text(
-                //                                         e["location"]!,
-                //                                         style: Theme.of(context).textTheme.caption,
-                //                                       ),
-                //                                     ],
-                //                                   ),
-                //                                 ],
-                //                               ),
-                //                             )
-                //                           ],
-                //                         ),
-                //                       ),
-                //                     ),
-                //                   ),
-                //                 ),
-                //               )
-                //               .toList(),
-                //         ),
-                //       ),
-                //     ],
-                //   ),
-                // )
+                const SizedBox(
+                  height: 20,
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                "History",
+                                style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                ),
+                              ),
+                              const SizedBox(
+                                width: 5,
+                              ),
+                              JustTheTooltip(
+                                triggerMode: TooltipTriggerMode.tap,
+                                content: Container(
+                                  height: 90,
+                                  width: 100,
+                                  padding: const EdgeInsets.all(10),
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Icon(
+                                            Icons.circle,
+                                            color: Colors.greenAccent.withOpacity(0.6),
+                                            size: 18,
+                                          ),
+                                          const SizedBox(
+                                            width: 5,
+                                          ),
+                                          Text(
+                                            "Add",
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Row(
+                                        children: [
+                                          Icon(
+                                            Icons.circle,
+                                            color: Colors.orangeAccent.withOpacity(0.5),
+                                            size: 18,
+                                          ),
+                                          const SizedBox(
+                                            width: 5,
+                                          ),
+                                          Text(
+                                            "Update",
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Row(
+                                        children: [
+                                          Icon(
+                                            Icons.circle,
+                                            color: Colors.redAccent.withOpacity(0.6),
+                                            size: 18,
+                                          ),
+                                          const SizedBox(
+                                            width: 5,
+                                          ),
+                                          Text(
+                                            "Delete",
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                                  decoration: const BoxDecoration(
+                                    color: Colors.grey,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    size: 10,
+                                    Icons.question_mark,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          TextButton(
+                            style: TextButton.styleFrom(
+                              backgroundColor: Colors.blueAccent.withOpacity(0.1),
+                            ),
+                            onPressed: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const HistoryScreen(),
+                                  ));
+                            },
+                            child: const Text(
+                              "See All",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Padding(
+                        padding: const EdgeInsets.only(
+                          left: 20.0,
+                          right: 20.0,
+                          bottom: 10.0,
+                        ),
+                        child: ListView.builder(
+                          physics: const NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          itemCount: history.length,
+                          itemBuilder: (context, index) {
+                            if (index < 4) {
+                              return Container(
+                                margin: const EdgeInsets.only(bottom: 20),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(15),
+                                  color: Colors.white,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.2),
+                                      spreadRadius: 1,
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 3), // changes position of shadow
+                                    ),
+                                  ],
+                                ),
+                                child: InkWell(
+                                  onTap: () {},
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Container(
+                                            width: 50,
+                                            height: 50,
+                                            margin: const EdgeInsets.symmetric(horizontal: 10),
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(15),
+                                              image: DecorationImage(
+                                                image: NetworkImage(
+                                                  history[index].photo.toString(),
+                                                ),
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.all(12.0),
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                SizedBox(
+                                                  width: 100,
+                                                  child: Text(
+                                                    overflow: TextOverflow.fade,
+                                                    history[index].name.toString().toUpperCase(),
+                                                    style: GoogleFonts.poppins(
+                                                      fontSize: 18,
+                                                      fontWeight: FontWeight.w600,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Text(
+                                                    DateFormat('dd MMMM, kk:mm').format(DateTime.fromMillisecondsSinceEpoch(
+                                                        int.tryParse(history[index].time.toString())!)),
+                                                    style: GoogleFonts.poppins(fontSize: 12)),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Container(
+                                          margin: const EdgeInsets.only(right: 10),
+                                          padding: const EdgeInsets.all(10),
+                                          decoration: BoxDecoration(
+                                            color: logColors(history[index].log.toString()),
+                                            borderRadius: const BorderRadius.all(Radius.circular(10)),
+                                          ),
+                                          child: Text(history[index].cages.toString(),
+                                              style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w300))),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            } else {
+                              return const SizedBox();
+                            }
+                          },
+                        )),
+                  ],
+                ),
               ],
             ),
           ),
@@ -469,16 +582,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Color categoryColors(String category) {
+  Color logColors(String category) {
     switch (category) {
-      case "koloni":
-        return Colors.red;
-      case "solo":
-        return Colors.black;
-      case "ip":
-        return Colors.blue;
+      case "add":
+        return Colors.greenAccent.withOpacity(0.6);
+      case "update":
+        return Colors.orangeAccent.withOpacity(0.5);
+      case "delete":
+        return Colors.redAccent.withOpacity(0.6);
       default:
-        return Colors.white;
+        return Colors.grey;
     }
   }
 }

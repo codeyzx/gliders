@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gliders/src/features/home/domain/cages/cages.dart';
+import 'package:gliders/src/features/cages/domain/cages/cages.dart';
 import 'package:logger/logger.dart';
 
 class CagesScanScreen extends ConsumerStatefulWidget {

@@ -1,26 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gliders/src/features/cages/presentation/cages_add_screen.dart';
-import 'package:gliders/src/features/cages/presentation/cages_detail_screen.dart';
-import 'package:gliders/src/features/cages/domain/cages/cages.dart';
-import 'package:gliders/src/features/home/presentation/cages_controller.dart';
+import 'package:gliders/src/features/history/domain/history.dart';
+import 'package:gliders/src/features/history/presentation/history_controller.dart';
 import 'package:gliders/src/shared/theme.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:intl/intl.dart';
 
-class CagesScreen extends ConsumerStatefulWidget {
-  static const routeName = '/cages';
-  const CagesScreen({super.key});
+class HistoryScreen extends ConsumerStatefulWidget {
+  static const routeName = '/history';
+  const HistoryScreen({super.key});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _CagesScreenState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _HistoryScreenState();
 }
 
-class _CagesScreenState extends ConsumerState<CagesScreen> {
+class _HistoryScreenState extends ConsumerState<HistoryScreen> {
   final List<bool> _isSelected = [true, false, false, false];
-  List<Cages> cages = [];
-  List<Cages> cagesFilter = [];
+  List<History> history = [];
+  List<History> historyFilter = [];
 
   @override
   void initState() {
@@ -29,10 +28,10 @@ class _CagesScreenState extends ConsumerState<CagesScreen> {
   }
 
   Future<void> initCages() async {
-    final returnCages = ref.read(cagesControllerProvider);
+    final returnCages = ref.read(historyControllerProvider);
     setState(() {
-      cages.addAll(returnCages);
-      cagesFilter.addAll(returnCages);
+      history.addAll(returnCages);
+      historyFilter.addAll(returnCages);
     });
   }
 
@@ -74,26 +73,6 @@ class _CagesScreenState extends ConsumerState<CagesScreen> {
             labelText: "Search by Username",
           ),
         ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 10.0),
-            child: IconButton(
-              tooltip: 'Add Cages',
-              icon: const Icon(
-                Icons.add,
-                color: Colors.black,
-                size: 32,
-              ),
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const CagesAddScreen(isEdit: false),
-                    ));
-              },
-            ),
-          ),
-        ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10.0),
@@ -103,7 +82,7 @@ class _CagesScreenState extends ConsumerState<CagesScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
-                  'Categories',
+                  'Filter',
                   style: GoogleFonts.poppins(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -133,8 +112,8 @@ class _CagesScreenState extends ConsumerState<CagesScreen> {
                               _isSelected[2] = false;
                               _isSelected[3] = false;
 
-                              cages.clear();
-                              cages.addAll(cagesFilter);
+                              history.clear();
+                              history.addAll(historyFilter);
                             }
                             // articles.clear();
                             // articles.addAll(article);
@@ -148,7 +127,7 @@ class _CagesScreenState extends ConsumerState<CagesScreen> {
                         selectedColor: primary,
                         labelPadding: EdgeInsets.symmetric(vertical: 6.h, horizontal: 24.w),
                         label: Text(
-                          'Koloni',
+                          'Add',
                           style: _isSelected[1] ? chipSelected : chipUnSelected,
                         ),
                         selected: _isSelected[1],
@@ -160,9 +139,9 @@ class _CagesScreenState extends ConsumerState<CagesScreen> {
                               _isSelected[2] = false;
                               _isSelected[3] = false;
 
-                              final koloni = cagesFilter.where((element) => element.category == 'koloni').toList();
-                              cages.clear();
-                              cages.addAll(koloni);
+                              final koloni = historyFilter.where((element) => element.log == 'add').toList();
+                              history.clear();
+                              history.addAll(koloni);
                             }
                             // articles.clear();
                             // articles.addAll(article);
@@ -176,7 +155,7 @@ class _CagesScreenState extends ConsumerState<CagesScreen> {
                         selectedColor: primary,
                         labelPadding: EdgeInsets.symmetric(vertical: 6.h, horizontal: 24.w),
                         label: Text(
-                          'Solo',
+                          'Update',
                           style: _isSelected[2] ? chipSelected : chipUnSelected,
                         ),
                         selected: _isSelected[2],
@@ -188,9 +167,9 @@ class _CagesScreenState extends ConsumerState<CagesScreen> {
                               _isSelected[1] = false;
                               _isSelected[3] = false;
 
-                              final solo = cagesFilter.where((element) => element.category == 'solo').toList();
-                              cages.clear();
-                              cages.addAll(solo);
+                              final solo = historyFilter.where((element) => element.log == 'update').toList();
+                              history.clear();
+                              history.addAll(solo);
                             }
                             // articles.clear();
                             // articles.addAll(article);
@@ -204,7 +183,7 @@ class _CagesScreenState extends ConsumerState<CagesScreen> {
                         selectedColor: primary,
                         labelPadding: EdgeInsets.symmetric(vertical: 6.h, horizontal: 24.w),
                         label: Text(
-                          'IP',
+                          'Delete',
                           style: _isSelected[3] ? chipSelected : chipUnSelected,
                         ),
                         selected: _isSelected[3],
@@ -216,9 +195,9 @@ class _CagesScreenState extends ConsumerState<CagesScreen> {
                               _isSelected[1] = false;
                               _isSelected[2] = false;
 
-                              final ip = cagesFilter.where((element) => element.category == 'ip').toList();
-                              cages.clear();
-                              cages.addAll(ip);
+                              final ip = historyFilter.where((element) => element.log == 'delete').toList();
+                              history.clear();
+                              history.addAll(ip);
                             }
                             // articles.clear();
                             // articles.addAll(article);
@@ -236,86 +215,102 @@ class _CagesScreenState extends ConsumerState<CagesScreen> {
             const SizedBox(
               height: 20,
             ),
-            GridView.builder(
-              shrinkWrap: true,
+            ListView.builder(
               physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  mainAxisExtent: 260, mainAxisSpacing: 10, crossAxisSpacing: 5, crossAxisCount: 2),
-              itemCount: cages.length,
-              itemBuilder: (context, index) => InkWell(
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => CagesDetailScreen(cages: cages[index]),
-                      ));
-                },
-                child: Card(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15.0),
+              shrinkWrap: true,
+              itemCount: history.length,
+              itemBuilder: (context, index) {
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 20),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.2),
+                        spreadRadius: 1,
+                        blurRadius: 4,
+                        offset: const Offset(0, 3), // changes position of shadow
+                      ),
+                    ],
                   ),
-                  child: IntrinsicHeight(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  child: InkWell(
+                    onTap: () {},
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Container(
-                          width: 200,
-                          height: 150,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15),
-                            image: DecorationImage(
-                              image: NetworkImage(
-                                cages[index].images.toString(),
-                              ),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(12.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                cages[index].title.toString().toUpperCase(),
-                                style: GoogleFonts.poppins(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600,
+                        Row(
+                          children: [
+                            Container(
+                              width: 50,
+                              height: 50,
+                              margin: const EdgeInsets.symmetric(horizontal: 10),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(15),
+                                image: DecorationImage(
+                                  image: NetworkImage(
+                                    history[index].photo.toString(),
+                                  ),
+                                  fit: BoxFit.cover,
                                 ),
                               ),
-                              const SizedBox(height: 5),
-                              Row(
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Icon(
-                                    Icons.category,
-                                    size: 15,
-                                    color: Colors.grey,
-                                  ),
-                                  const SizedBox(width: 5),
-                                  Text(
-                                    cages[index].category.toString(),
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400,
-                                      color: Colors.grey,
+                                  SizedBox(
+                                    width: 100,
+                                    child: Text(
+                                      overflow: TextOverflow.fade,
+                                      history[index].name.toString().toUpperCase(),
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     ),
                                   ),
+                                  Text(
+                                      DateFormat('dd MMMM, kk:mm').format(DateTime.fromMillisecondsSinceEpoch(
+                                          int.tryParse(history[index].time.toString())!)),
+                                      style: GoogleFonts.poppins(fontSize: 12)),
                                 ],
                               ),
-                              const SizedBox(height: 8),
-                              Text(cages[index].gliders!.join(", "), style: GoogleFonts.poppins(fontSize: 12)),
-                            ],
-                          ),
-                        )
+                            ),
+                          ],
+                        ),
+                        Container(
+                            margin: const EdgeInsets.only(right: 10),
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: logColors(history[index].log.toString()),
+                              borderRadius: const BorderRadius.all(Radius.circular(10)),
+                            ),
+                            child: Text(history[index].cages.toString(),
+                                style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w300))),
                       ],
                     ),
                   ),
-                ),
-              ),
+                );
+              },
             ),
           ],
         ),
       ),
     );
+  }
+
+  Color logColors(String category) {
+    switch (category) {
+      case "add":
+        return Colors.greenAccent.withOpacity(0.6);
+      case "update":
+        return Colors.orangeAccent.withOpacity(0.5);
+      case "delete":
+        return Colors.redAccent.withOpacity(0.6);
+      default:
+        return Colors.grey;
+    }
   }
 }

@@ -101,9 +101,9 @@ class _BotNavBarScreenState extends ConsumerState<BotNavBarScreen> {
                   BottomNavigationBarItem(
                     icon: Padding(
                       padding: EdgeInsets.only(top: 8.0.h),
-                      child: const Icon(Icons.bar_chart_outlined),
+                      child: const Icon(Icons.person),
                     ),
-                    label: 'Statistic',
+                    label: 'Profile',
                   ),
                 ],
               ),

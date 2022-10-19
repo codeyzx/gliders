@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gliders/src/features/home/domain/cages/cages.dart';
+import 'package:gliders/src/features/auth/presentation/auth_controller.dart';
+import 'package:gliders/src/features/cages/domain/cages/cages.dart';
 import 'package:gliders/src/features/home/presentation/botnavbar_screen.dart';
 import 'package:gliders/src/features/home/presentation/cages_controller.dart';
 import 'package:gliders/src/shared/theme.dart';
@@ -33,6 +34,8 @@ class _CagesAddScreenState extends ConsumerState<CagesAddScreen> {
       _notesController.text = widget.cages!.notes.toString();
       _imageController.text = widget.cages!.images.toString();
       listGliders.addAll(widget.cages!.gliders!.toList());
+    } else {
+      _categoryController.text = 'koloni';
     }
   }
 
@@ -48,6 +51,7 @@ class _CagesAddScreenState extends ConsumerState<CagesAddScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final users = ref.watch(authControllerProvider);
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -89,10 +93,10 @@ class _CagesAddScreenState extends ConsumerState<CagesAddScreen> {
               ],
             ),
             TextButton(
-              onPressed: () {
+              onPressed: () async {
                 if (_formKey.currentState!.validate()) {
                   if (widget.isEdit) {
-                    ref.read(cagesControllerProvider.notifier).update(
+                    await ref.read(cagesControllerProvider.notifier).update(
                           Cages(
                             id: widget.cages!.id,
                             title: _titleController.text,
@@ -101,23 +105,30 @@ class _CagesAddScreenState extends ConsumerState<CagesAddScreen> {
                             images: _imageController.text,
                             gliders: listGliders,
                           ),
+                          name: users.name.toString(),
+                          photo: users.photo.toString(),
                         );
                   } else {
-                    ref.read(cagesControllerProvider.notifier).add(
+                    await ref.read(cagesControllerProvider.notifier).add(
                           title: _titleController.text,
                           category: _categoryController.text,
                           gliders: listGliders,
                           images:
                               _imageController.text == '' ? 'https://picsum.photos/500/300?random=1' : _imageController.text,
                           notes: _notesController.text,
+                          name: users.name.toString(),
+                          photo: users.photo.toString(),
                         );
                   }
 
-                  Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const BotNavBarScreen(),
-                      ));
+
+                  if (mounted) {
+                    Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const BotNavBarScreen(),
+                        ));
+                  }
                 }
               },
               child: Text(
@@ -139,7 +150,7 @@ class _CagesAddScreenState extends ConsumerState<CagesAddScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'title',
+                      'title *',
                       style: textTitleBookmark,
                     ),
                     SizedBox(
@@ -173,31 +184,46 @@ class _CagesAddScreenState extends ConsumerState<CagesAddScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'category',
+                      'category *',
                       style: textTitleBookmark,
                     ),
                     SizedBox(
                       height: 6.h,
                     ),
-                    TextFormField(
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter category';
-                        }
-                        return null;
-                      },
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      controller: _categoryController,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(6.r),
-                          borderSide: BorderSide(width: 1, color: graySecond),
+                    DropdownButtonFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter category';
+                          }
+                          return null;
+                        },
+                        items: const [
+                          DropdownMenuItem(
+                            value: 'koloni',
+                            child: Text('koloni'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'solo',
+                            child: Text('solo'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'ip',
+                            child: Text('ip'),
+                          ),
+                        ],
+                        value: _categoryController.text,
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(6.r),
+                            borderSide: BorderSide(width: 1, color: graySecond),
+                          ),
+                          contentPadding: const EdgeInsets.all(12),
+                          hintStyle: tagHint,
                         ),
-                        contentPadding: const EdgeInsets.all(12),
-                        hintText: 'koloni',
-                        hintStyle: tagHint,
-                      ),
-                    ),
+                        onChanged: (value) {
+                          _categoryController.text = value.toString();
+                        }),
                     SizedBox(
                       height: 18.h,
                     ),
@@ -263,7 +289,7 @@ class _CagesAddScreenState extends ConsumerState<CagesAddScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'gliders',
+                      'gliders *',
                       style: textTitleBookmark,
                     ),
                     SizedBox(

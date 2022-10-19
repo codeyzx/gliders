@@ -1,8 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gliders/src/features/auth/presentation/auth_controller.dart';
+import 'package:gliders/src/features/cages/domain/cages/cages.dart';
 import 'package:gliders/src/features/cages/presentation/cages_add_screen.dart';
-import 'package:gliders/src/features/home/domain/cages/cages.dart';
 import 'package:gliders/src/features/home/presentation/cages_controller.dart';
 import 'package:gliders/src/shared/theme.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -11,7 +12,7 @@ import 'package:logger/logger.dart';
 class CagesDetailScreen extends ConsumerStatefulWidget {
   final Cages? cages;
   final String? id;
-  const CagesDetailScreen({super.key,  this.cages, this.id});
+  const CagesDetailScreen({super.key, this.cages, this.id});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _CagesDetailScreenState();
@@ -42,6 +43,7 @@ class _CagesDetailScreenState extends ConsumerState<CagesDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final users = ref.watch(authControllerProvider);
     return Scaffold(
       extendBodyBehindAppBar: true, // <-- Set this
       appBar: AppBar(
@@ -263,7 +265,10 @@ class _CagesDetailScreenState extends ConsumerState<CagesDetailScreen> {
                             ),
                             TextButton(
                               onPressed: () {
-                                ref.read(cagesControllerProvider.notifier).delete(widget.cages!.id.toString());
+                                ref.read(cagesControllerProvider.notifier).delete(widget.cages!.id.toString(),
+                                    title: widget.cages!.title.toString(),
+                                    name: users.name.toString(),
+                                    photo: users.photo.toString());
                                 Navigator.pop(context);
                                 Navigator.pop(context);
                               },
