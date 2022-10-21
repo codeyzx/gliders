@@ -169,13 +169,36 @@ class _CagesDetailScreenState extends ConsumerState<CagesDetailScreen> {
                         ),
                       ),
                       Text(
-                        'Gliders: \n${widget.cages?.gliders?.toString().replaceAll('[', '').replaceAll(']', '')}',
+                        'Gliders',
                         style: GoogleFonts.poppins(
                           fontSize: 20,
                           fontWeight: FontWeight.w600,
-                          color: Colors.black,
+                          color: Colors.grey,
                         ),
                       ),
+
+                      for (var i = 0; i < widget.cages!.gliders!.length; i++)
+                        Text(
+                          widget.cages!.gliders![i].toString(),
+                          style: GoogleFonts.poppins(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.black,
+                          ),
+                        ),
+                      // Text(
+                      //   widget.cages!.gliders!.map((e) => e['name']).toList().join(', '),
+                      //   style: GoogleFonts.poppins(fontSize: 12),
+                      // ),
+                      // Text(
+                      //   'Gliders: \n${widget.cages?.gliders?.toString().replaceAll('[', '').replaceAll(']', '')}',
+                      //   style: GoogleFonts.poppins(
+                      //     fontSize: 20,
+                      //     fontWeight: FontWeight.w600,
+                      //     color: Colors.black,
+                      //   ),
+                      // ),
+
                       if (widget.cages?.notes != '')
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,

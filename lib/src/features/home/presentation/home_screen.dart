@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gliders/src/features/auth/presentation/auth_controller.dart';
-import 'package:gliders/src/features/cages/presentation/cages_detail_screen.dart';
+import 'package:gliders/src/features/auth/presentation/sign_in_screen.dart';
+import 'package:gliders/src/features/cages/presentation/cages_detail_screens.dart';
 import 'package:gliders/src/features/cages/presentation/cages_screen.dart';
 import 'package:gliders/src/features/history/presentation/history_controller.dart';
 import 'package:gliders/src/features/history/presentation/history_screen.dart';
-import 'package:gliders/src/features/home/presentation/barcodescan_screen.dart';
 import 'package:gliders/src/features/home/presentation/cages_controller.dart';
-import 'package:gliders/src/features/home/widgets/chart.dart';
+import 'package:gliders/src/features/home/widgets/chart_cages.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:intl/intl.dart';
 import 'package:just_the_tooltip/just_the_tooltip.dart';
+import 'package:logger/logger.dart';
+import 'package:go_router/go_router.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   static const routeName = 'home';
@@ -67,25 +69,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       }
     }
 
-    List menus = [
-      {
-        "icon": "https://i.ibb.co/9HgyMh6/3658538.png",
-        "label": "Cages",
-      },
-      {
-        "icon": "https://i.ibb.co/Pt09Sdz/2942962.png",
-        "label": "Statistic",
-      },
-      {
-        "icon": "https://i.ibb.co/RcMMhBr/3009489.png",
-        "label": "History",
-      },
-      {
-        "icon": "https://i.ibb.co/w0K3vY6/5996290.png",
-        "label": "More",
-      }
-    ];
-
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -109,19 +92,50 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Row(
                       children: [
-                        Container(
-                          width: 50,
-                          height: 50,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(80),
-                              //
-                              //User Photo
-                              //
-                              image: DecorationImage(
-                                image: NetworkImage(
-                                  users.photo.toString(),
+                        Material(
+                          child: InkWell(
+                            onTap: () async {
+                              //show dialog to confirm logout
+                              await showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: const Text('Logout'),
+                                  content: const Text('Are you sure you want to logout?'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: const Text('Cancel'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () async {
+                                        await ref.read(authControllerProvider.notifier).googleSignOut();
+                                        if (mounted) {
+                                          context.goNamed(SignInScreen.routeName);
+                                        }
+                                      },
+                                      child: const Text('Logout'),
+                                    ),
+                                  ],
                                 ),
-                              )),
+                              );
+                            },
+                            child: Container(
+                              width: 50,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  //
+                                  //User Photo
+                                  //
+                                  image: DecorationImage(
+                                    image: NetworkImage(
+                                      users.photo.toString(),
+                                    ),
+                                  )),
+                            ),
+                          ),
                         ),
                         const Spacer(),
                         Column(
@@ -153,7 +167,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         //
                         const Spacer(),
                         InkWell(
-                          onTap: () {},
+                          onTap: () {
+                            final gliders = cages.map((e) => e.gliders).toList();
+
+                            final glidersBetina =
+                                gliders.map((e) => e!.where((element) => element.containsValue('betina')).length).toList();
+                            final glidersBetinaLength = glidersBetina.reduce((value, element) => value + element);
+                            Logger().e(glidersBetinaLength);
+                          },
                           child: const SizedBox(
                             width: 32.0,
                             child: Icon(
@@ -169,7 +190,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                Chart(
+                ChartCages(
                     koloniLength: koloniLength.toDouble(),
                     soloLength: soloLength.toDouble(),
                     totalLength: totalLength.toDouble(),
@@ -179,57 +200,57 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     soloPercentage: soloPercentage,
                     ipPercentage: ipPercentage,
                     othersPercentage: othersPercentage),
-                const SizedBox(height: 30),
+                const SizedBox(height: 10),
                 //
                 //Card suggest
                 //
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: List.generate(
-                    menus.length,
-                    (index) {
-                      var item = menus[index];
-                      return Column(
-                        children: [
-                          Container(
-                            height: 60,
-                            width: 60,
-                            decoration: BoxDecoration(
-                              color: Colors.blueAccent.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Stack(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(10.0),
-                                  child: Image.network(item["icon"]),
-                                ),
-                                Material(
-                                  color: Colors.transparent,
-                                  borderRadius: BorderRadius.circular(60),
-                                  child: InkWell(
-                                    onTap: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => const BarcodescanScreen(),
-                                          ));
-                                    },
-                                    borderRadius: BorderRadius.circular(60),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                          Text(item["label"]),
-                        ],
-                      );
-                    },
-                  ),
-                ),
-                const SizedBox(height: 30),
-                //
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                //   children: List.generate(
+                //     menus.length,
+                //     (index) {
+                //       var item = menus[index];
+                //       return Column(
+                //         children: [
+                //           Container(
+                //             height: 60,
+                //             width: 60,
+                //             decoration: BoxDecoration(
+                //               color: Colors.blueAccent.withOpacity(0.2),
+                //               borderRadius: BorderRadius.circular(12),
+                //             ),
+                //             child: Stack(
+                //               children: [
+                //                 Padding(
+                //                   padding: const EdgeInsets.all(10.0),
+                //                   child: Image.network(item["icon"]),
+                //                 ),
+                //                 Material(
+                //                   color: Colors.transparent,
+                //                   borderRadius: BorderRadius.circular(60),
+                //                   child: InkWell(
+                //                     onTap: () {
+                //                       Navigator.push(
+                //                           context,
+                //                           MaterialPageRoute(
+                //                             builder: (context) => const BarcodescanScreen(),
+                //                           ));
+                //                     },
+                //                     borderRadius: BorderRadius.circular(60),
+                //                   ),
+                //                 ),
+                //               ],
+                //             ),
+                //           ),
+                //           const SizedBox(height: 5),
+                //           Text(item["label"]),
+                //         ],
+                //       );
+                //     },
+                //   ),
+                // ),
+                // const SizedBox(height: 30),
+                // //
                 //Card Popular Nearby
                 //
                 Column(
@@ -283,7 +304,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) => CagesDetailScreen(cages: item),
+                                          builder: (context) => CagesDetailScreens(product: item),
                                         ));
                                   },
                                   child: Card(
@@ -339,7 +360,30 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                                   ],
                                                 ),
                                                 const SizedBox(height: 8),
-                                                Text(item.gliders!.join(", "), style: GoogleFonts.poppins(fontSize: 12)),
+                                                // Text(item.gliders!.join(", "), style: GoogleFonts.poppins(fontSize: 12)),
+                                                Text(
+                                                  item.gliders!.map((e) => e['name']).toList().join(', '),
+                                                  style: GoogleFonts.poppins(fontSize: 12),
+                                                  overflow: TextOverflow.ellipsis,
+                                                ),
+                                                // Row(
+                                                //   children: item.gliders!.map((e) {
+                                                //     // get values of name
+                                                //     var name = e["name"];
+                                                //     return Row(
+                                                //       children: [
+                                                //         Text(
+                                                //           name.toString(),
+                                                //           style: GoogleFonts.poppins(
+                                                //             fontSize: 12,
+                                                //             fontWeight: FontWeight.w400,
+                                                //           ),
+                                                //         ),
+                                                //         const SizedBox(width: 5),
+                                                //       ],
+                                                //     );
+                                                //   }).toList(),
+                                                // )
                                               ],
                                             ),
                                           )
@@ -356,7 +400,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ],
                 ),
                 const SizedBox(
-                  height: 20,
+                  height: 30,
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

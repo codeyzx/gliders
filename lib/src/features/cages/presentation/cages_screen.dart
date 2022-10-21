@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:gliders/src/features/auth/presentation/auth_controller.dart';
 import 'package:gliders/src/features/cages/presentation/cages_add_screen.dart';
 import 'package:gliders/src/features/cages/presentation/cages_detail_screen.dart';
 import 'package:gliders/src/features/cages/domain/cages/cages.dart';
+import 'package:gliders/src/features/cages/presentation/cages_detail_screens.dart';
 import 'package:gliders/src/features/home/presentation/cages_controller.dart';
 import 'package:gliders/src/shared/theme.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -236,18 +239,17 @@ class _CagesScreenState extends ConsumerState<CagesScreen> {
             const SizedBox(
               height: 20,
             ),
-            GridView.builder(
+            MasonryGridView.count(
+              itemCount: cages.length,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  mainAxisExtent: 260, mainAxisSpacing: 10, crossAxisSpacing: 5, crossAxisCount: 2),
-              itemCount: cages.length,
+              crossAxisCount: 2,
               itemBuilder: (context, index) => InkWell(
                 onTap: () {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => CagesDetailScreen(cages: cages[index]),
+                        builder: (context) => CagesDetailScreens(product: cages[index]),
                       ));
                 },
                 child: Card(
@@ -303,7 +305,10 @@ class _CagesScreenState extends ConsumerState<CagesScreen> {
                                 ],
                               ),
                               const SizedBox(height: 8),
-                              Text(cages[index].gliders!.join(", "), style: GoogleFonts.poppins(fontSize: 12)),
+                              Text(
+                                cages[index].gliders!.map((e) => e['name']).toList().join(', '),
+                                style: GoogleFonts.poppins(fontSize: 12),
+                              ),
                             ],
                           ),
                         )
@@ -313,6 +318,89 @@ class _CagesScreenState extends ConsumerState<CagesScreen> {
                 ),
               ),
             ),
+            // GridView.builder(
+            //   shrinkWrap: true,
+            //   physics: const NeverScrollableScrollPhysics(),
+            //   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            //       crossAxisCount: 2, childAspectRatio: ((MediaQuery.of(context).size.width - (16 + 16 + 9)) / 2) / 241),
+            //   // gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            //   //     mainAxisExtent: 260, mainAxisSpacing: 10, crossAxisSpacing: 5, crossAxisCount: 2),
+            //   itemCount: cages.length,
+            //   itemBuilder: (context, index) => InkWell(
+            //     onTap: () {
+            //       Navigator.push(
+            //           context,
+            //           MaterialPageRoute(
+            //             builder: (context) => CagesDetailScreen(cages: cages[index]),
+            //           ));
+            //     },
+            //     child: Card(
+            //       shape: RoundedRectangleBorder(
+            //         borderRadius: BorderRadius.circular(15.0),
+            //       ),
+            //       child: IntrinsicHeight(
+            //         child: Column(
+            //           crossAxisAlignment: CrossAxisAlignment.start,
+            //           children: [
+            //             Container(
+            //               width: 200,
+            //               height: 150,
+            //               decoration: BoxDecoration(
+            //                 borderRadius: BorderRadius.circular(15),
+            //                 image: DecorationImage(
+            //                   image: NetworkImage(
+            //                     cages[index].images.toString(),
+            //                   ),
+            //                   fit: BoxFit.cover,
+            //                 ),
+            //               ),
+            //             ),
+            //             Padding(
+            //               padding: const EdgeInsets.all(12.0),
+            //               child: Column(
+            //                 crossAxisAlignment: CrossAxisAlignment.start,
+            //                 children: [
+            //                   Text(
+            //                     cages[index].title.toString().toUpperCase(),
+            //                     style: GoogleFonts.poppins(
+            //                       fontSize: 18,
+            //                       fontWeight: FontWeight.w600,
+            //                     ),
+            //                   ),
+            //                   const SizedBox(height: 5),
+            //                   Row(
+            //                     children: [
+            //                       const Icon(
+            //                         Icons.category,
+            //                         size: 15,
+            //                         color: Colors.grey,
+            //                       ),
+            //                       const SizedBox(width: 5),
+            //                       Text(
+            //                         cages[index].category.toString(),
+            //                         style: GoogleFonts.poppins(
+            //                           fontSize: 12,
+            //                           fontWeight: FontWeight.w400,
+            //                           color: Colors.grey,
+            //                         ),
+            //                       ),
+            //                     ],
+            //                   ),
+            //                   const SizedBox(height: 8),
+            //                   Text(
+            //                     cages[index].gliders!.map((e) => e['name']).toList().join(', '),
+            //                     style: GoogleFonts.poppins(fontSize: 12),
+            //                     overflow: TextOverflow.ellipsis,
+            //                   ),
+            //                 ],
+            //               ),
+            //             )
+            //           ],
+            //         ),
+            //       ),
+            //     ),
+            //   ),
+            // ),
           ],
         ),
       ),

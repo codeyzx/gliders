@@ -2,35 +2,25 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:gliders/src/features/home/widgets/indicator.dart';
 
-class Chart extends StatefulWidget {
-  final double koloniLength;
-  final double soloLength;
-  final double totalLength;
-  final double ipLength;
-  final double othersLength;
-  final String koloniPercentage;
-  final String soloPercentage;
-  final String ipPercentage;
-  final String othersPercentage;
+class ChartGliders extends StatefulWidget {
+  final double jantanLength;
+  final double betinaLength;
+  final String jantanPercentage;
+  final String betinaPercentage;
 
-  const Chart({
+  const ChartGliders({
     Key? key,
-    required this.koloniLength,
-    required this.soloLength,
-    required this.totalLength,
-    required this.ipLength,
-    required this.othersLength,
-    required this.koloniPercentage,
-    required this.soloPercentage,
-    required this.ipPercentage,
-    required this.othersPercentage,
+    required this.jantanLength,
+    required this.betinaLength,
+    required this.jantanPercentage,
+    required this.betinaPercentage,
   }) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => ChartState();
+  State<StatefulWidget> createState() => ChartGlidersState();
 }
 
-class ChartState extends State<Chart> {
+class ChartGlidersState extends State<ChartGliders> {
   int touchedIndex = -1;
 
   @override
@@ -65,14 +55,11 @@ class ChartState extends State<Chart> {
                     sectionsSpace: 0,
                     centerSpaceRadius: 35,
                     sections: showingSections(
-                        koloniPercentage: widget.koloniPercentage,
-                        soloPercentage: widget.soloPercentage,
-                        ipPercentage: widget.ipPercentage,
-                        othersPercentage: widget.othersPercentage,
-                        koloniLength: widget.koloniLength,
-                        soloLength: widget.soloLength,
-                        ipLength: widget.ipLength,
-                        othersLength: widget.othersLength),
+                      jantanPercentage: widget.jantanPercentage,
+                      betinaPercentage: widget.betinaPercentage,
+                      jantanLength: widget.jantanLength,
+                      betinaLength: widget.betinaLength,
+                    ),
                   ),
                 ),
               ),
@@ -83,7 +70,7 @@ class ChartState extends State<Chart> {
               children: const <Widget>[
                 Indicator(
                   color: Color(0xff0293ee),
-                  text: 'Koloni',
+                  text: 'Jantan',
                   isSquare: true,
                 ),
                 SizedBox(
@@ -91,23 +78,7 @@ class ChartState extends State<Chart> {
                 ),
                 Indicator(
                   color: Color(0xfff8b250),
-                  text: 'Solo',
-                  isSquare: true,
-                ),
-                SizedBox(
-                  height: 4,
-                ),
-                Indicator(
-                  color: Color(0xff845bef),
-                  text: 'IP',
-                  isSquare: true,
-                ),
-                SizedBox(
-                  height: 4,
-                ),
-                Indicator(
-                  color: Colors.grey,
-                  text: 'Others',
+                  text: 'Betina',
                   isSquare: true,
                 ),
               ],
@@ -121,16 +92,13 @@ class ChartState extends State<Chart> {
     );
   }
 
-  List<PieChartSectionData> showingSections(
-      {required String koloniPercentage,
-      required String soloPercentage,
-      required String ipPercentage,
-      required String othersPercentage,
-      required double koloniLength,
-      required double soloLength,
-      required double ipLength,
-      required double othersLength}) {
-    return List.generate(4, (i) {
+  List<PieChartSectionData> showingSections({
+    required String jantanPercentage,
+    required String betinaPercentage,
+    required double jantanLength,
+    required double betinaLength,
+  }) {
+    return List.generate(2, (i) {
       final isTouched = i == touchedIndex;
       final fontSize = isTouched ? 25.0 : 16.0;
       final radius = isTouched ? 60.0 : 50.0;
@@ -138,8 +106,8 @@ class ChartState extends State<Chart> {
         case 0:
           return PieChartSectionData(
             color: const Color(0xff0293ee),
-            value: koloniLength.toDouble(),
-            title: '$koloniPercentage%',
+            value: jantanLength.toDouble(),
+            title: '$jantanPercentage%',
             radius: radius,
             titleStyle: TextStyle(
               fontSize: fontSize,
@@ -150,32 +118,8 @@ class ChartState extends State<Chart> {
         case 1:
           return PieChartSectionData(
             color: const Color(0xfff8b250),
-            value: soloLength.toDouble(),
-            title: '$soloPercentage%',
-            radius: radius,
-            titleStyle: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xffffffff),
-            ),
-          );
-        case 2:
-          return PieChartSectionData(
-            color: const Color(0xff845bef),
-            value: ipLength.toDouble(),
-            title: '$ipPercentage%',
-            radius: radius,
-            titleStyle: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xffffffff),
-            ),
-          );
-        case 3:
-          return PieChartSectionData(
-            color: Colors.grey,
-            value: othersLength.toDouble(),
-            title: '$othersPercentage%',
+            value: betinaLength.toDouble(),
+            title: '$betinaPercentage%',
             radius: radius,
             titleStyle: TextStyle(
               fontSize: fontSize,

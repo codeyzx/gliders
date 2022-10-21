@@ -27,7 +27,7 @@ mixin _$Cages {
   @JsonKey(name: 'category')
   String? get category => throw _privateConstructorUsedError;
   @JsonKey(name: 'gliders')
-  List<String>? get gliders => throw _privateConstructorUsedError;
+  List<Map<String, dynamic>>? get gliders => throw _privateConstructorUsedError;
   @JsonKey(name: 'images')
   String? get images => throw _privateConstructorUsedError;
   @JsonKey(name: 'notes')
@@ -46,7 +46,7 @@ abstract class $CagesCopyWith<$Res> {
       {@JsonKey(name: 'id') String? id,
       @JsonKey(name: 'title') String? title,
       @JsonKey(name: 'category') String? category,
-      @JsonKey(name: 'gliders') List<String>? gliders,
+      @JsonKey(name: 'gliders') List<Map<String, dynamic>>? gliders,
       @JsonKey(name: 'images') String? images,
       @JsonKey(name: 'notes') String? notes});
 }
@@ -84,7 +84,7 @@ class _$CagesCopyWithImpl<$Res> implements $CagesCopyWith<$Res> {
       gliders: gliders == freezed
           ? _value.gliders
           : gliders // ignore: cast_nullable_to_non_nullable
-              as List<String>?,
+              as List<Map<String, dynamic>>?,
       images: images == freezed
           ? _value.images
           : images // ignore: cast_nullable_to_non_nullable
@@ -106,7 +106,7 @@ abstract class _$$_CagesCopyWith<$Res> implements $CagesCopyWith<$Res> {
       {@JsonKey(name: 'id') String? id,
       @JsonKey(name: 'title') String? title,
       @JsonKey(name: 'category') String? category,
-      @JsonKey(name: 'gliders') List<String>? gliders,
+      @JsonKey(name: 'gliders') List<Map<String, dynamic>>? gliders,
       @JsonKey(name: 'images') String? images,
       @JsonKey(name: 'notes') String? notes});
 }
@@ -145,7 +145,7 @@ class __$$_CagesCopyWithImpl<$Res> extends _$CagesCopyWithImpl<$Res>
       gliders: gliders == freezed
           ? _value._gliders
           : gliders // ignore: cast_nullable_to_non_nullable
-              as List<String>?,
+              as List<Map<String, dynamic>>?,
       images: images == freezed
           ? _value.images
           : images // ignore: cast_nullable_to_non_nullable
@@ -165,7 +165,7 @@ class _$_Cages implements _Cages {
       {@JsonKey(name: 'id') this.id,
       @JsonKey(name: 'title') this.title,
       @JsonKey(name: 'category') this.category,
-      @JsonKey(name: 'gliders') final List<String>? gliders,
+      @JsonKey(name: 'gliders') final List<Map<String, dynamic>>? gliders,
       @JsonKey(name: 'images') this.images,
       @JsonKey(name: 'notes') this.notes})
       : _gliders = gliders;
@@ -182,10 +182,10 @@ class _$_Cages implements _Cages {
   @override
   @JsonKey(name: 'category')
   final String? category;
-  final List<String>? _gliders;
+  final List<Map<String, dynamic>>? _gliders;
   @override
   @JsonKey(name: 'gliders')
-  List<String>? get gliders {
+  List<Map<String, dynamic>>? get gliders {
     final value = _gliders;
     if (value == null) return null;
     // ignore: implicit_dynamic_type
@@ -246,7 +246,7 @@ abstract class _Cages implements Cages {
       {@JsonKey(name: 'id') final String? id,
       @JsonKey(name: 'title') final String? title,
       @JsonKey(name: 'category') final String? category,
-      @JsonKey(name: 'gliders') final List<String>? gliders,
+      @JsonKey(name: 'gliders') final List<Map<String, dynamic>>? gliders,
       @JsonKey(name: 'images') final String? images,
       @JsonKey(name: 'notes') final String? notes}) = _$_Cages;
 
@@ -263,7 +263,7 @@ abstract class _Cages implements Cages {
   String? get category;
   @override
   @JsonKey(name: 'gliders')
-  List<String>? get gliders;
+  List<Map<String, dynamic>>? get gliders;
   @override
   @JsonKey(name: 'images')
   String? get images;

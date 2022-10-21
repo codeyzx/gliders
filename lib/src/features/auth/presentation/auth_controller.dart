@@ -55,7 +55,7 @@ class AuthController extends StateNotifier<Users> {
     );
 
     await googleSignIn.signOut();
-    await FirebaseAuth.instance.signOut();
+    // await FirebaseAuth.instance.signOut();
 
     state = const Users();
   }

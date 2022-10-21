@@ -215,85 +215,88 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
             const SizedBox(
               height: 20,
             ),
-            ListView.builder(
-              physics: const NeverScrollableScrollPhysics(),
-              shrinkWrap: true,
-              itemCount: history.length,
-              itemBuilder: (context, index) {
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 20),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15),
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.2),
-                        spreadRadius: 1,
-                        blurRadius: 4,
-                        offset: const Offset(0, 3), // changes position of shadow
-                      ),
-                    ],
-                  ),
-                  child: InkWell(
-                    onTap: () {},
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Container(
-                              width: 50,
-                              height: 50,
-                              margin: const EdgeInsets.symmetric(horizontal: 10),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(15),
-                                image: DecorationImage(
-                                  image: NetworkImage(
-                                    history[index].photo.toString(),
-                                  ),
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(12.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  SizedBox(
-                                    width: 100,
-                                    child: Text(
-                                      overflow: TextOverflow.fade,
-                                      history[index].name.toString().toUpperCase(),
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ),
-                                  Text(
-                                      DateFormat('dd MMMM, kk:mm').format(DateTime.fromMillisecondsSinceEpoch(
-                                          int.tryParse(history[index].time.toString())!)),
-                                      style: GoogleFonts.poppins(fontSize: 12)),
-                                ],
-                              ),
-                            ),
-                          ],
+            SizedBox(
+              width: 1.sw,
+              height: 1.sh * 0.7,
+              child: ListView.builder(
+                physics: const BouncingScrollPhysics(),
+                itemCount: history.length,
+                itemBuilder: (context, index) {
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 20),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.2),
+                          spreadRadius: 1,
+                          blurRadius: 4,
+                          offset: const Offset(0, 3), // changes position of shadow
                         ),
-                        Container(
-                            margin: const EdgeInsets.only(right: 10),
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: logColors(history[index].log.toString()),
-                              borderRadius: const BorderRadius.all(Radius.circular(10)),
-                            ),
-                            child: Text(history[index].cages.toString(),
-                                style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w300))),
                       ],
                     ),
-                  ),
-                );
-              },
+                    child: InkWell(
+                      onTap: () {},
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                width: 50,
+                                height: 50,
+                                margin: const EdgeInsets.symmetric(horizontal: 10),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(15),
+                                  image: DecorationImage(
+                                    image: NetworkImage(
+                                      history[index].photo.toString(),
+                                    ),
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    SizedBox(
+                                      width: 100,
+                                      child: Text(
+                                        overflow: TextOverflow.fade,
+                                        history[index].name.toString().toUpperCase(),
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                    Text(
+                                        DateFormat('dd MMMM, kk:mm').format(DateTime.fromMillisecondsSinceEpoch(
+                                            int.tryParse(history[index].time.toString())!)),
+                                        style: GoogleFonts.poppins(fontSize: 12)),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          Container(
+                              margin: const EdgeInsets.only(right: 10),
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: logColors(history[index].log.toString()),
+                                borderRadius: const BorderRadius.all(Radius.circular(10)),
+                              ),
+                              child: Text(history[index].cages.toString(),
+                                  style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w300))),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
             ),
           ],
         ),

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gliders/src/features/home/presentation/barcodescan_screen.dart';
 import 'package:gliders/src/features/home/presentation/home_screen.dart';
-import 'package:gliders/src/features/profile/presentation/profile_screen.dart';
+import 'package:gliders/src/features/statistic/presentation/statistic_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 final currentScreenProvider = StateProvider<Widget>((ref) => const HomeScreen());
@@ -78,7 +78,7 @@ class _BotNavBarScreenState extends ConsumerState<BotNavBarScreen> {
                         //     ));
                         break;
                       case 2:
-                        ref.read(currentScreenProvider.state).state = const ProfileScreen();
+                        ref.read(currentScreenProvider.state).state = const StatisticScreen();
                         break;
                     }
                   });
@@ -101,9 +101,9 @@ class _BotNavBarScreenState extends ConsumerState<BotNavBarScreen> {
                   BottomNavigationBarItem(
                     icon: Padding(
                       padding: EdgeInsets.only(top: 8.0.h),
-                      child: const Icon(Icons.person),
+                      child: const Icon(Icons.bar_chart_rounded),
                     ),
-                    label: 'Profile',
+                    label: 'Statistic',
                   ),
                 ],
               ),

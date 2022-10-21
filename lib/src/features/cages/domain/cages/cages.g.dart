@@ -10,8 +10,9 @@ _$_Cages _$$_CagesFromJson(Map<String, dynamic> json) => _$_Cages(
       id: json['id'] as String?,
       title: json['title'] as String?,
       category: json['category'] as String?,
-      gliders:
-          (json['gliders'] as List<dynamic>?)?.map((e) => e as String).toList(),
+      gliders: (json['gliders'] as List<dynamic>?)
+          ?.map((e) => e as Map<String, dynamic>)
+          .toList(),
       images: json['images'] as String?,
       notes: json['notes'] as String?,
     );
