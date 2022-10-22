@@ -6,7 +6,8 @@ name: CD
 on:
   push:
     tags:
-      - "*" # on every version tag will build a new android artifact.
+      - "*"
+    branches: main
 jobs:
   build:
     name: Build APK
