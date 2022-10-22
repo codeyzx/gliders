@@ -1,321 +1,389 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gallery_saver/gallery_saver.dart';
 import 'package:gliders/src/features/auth/presentation/auth_controller.dart';
 import 'package:gliders/src/features/cages/domain/cages/cages.dart';
+import 'package:gliders/src/features/cages/domain/gliders/gliders.dart';
 import 'package:gliders/src/features/cages/presentation/cages_add_screen.dart';
 import 'package:gliders/src/features/home/presentation/cages_controller.dart';
 import 'package:gliders/src/shared/theme.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:logger/logger.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:qr_flutter/qr_flutter.dart';
+import 'package:share_plus/share_plus.dart';
 
 class CagesDetailScreen extends ConsumerStatefulWidget {
-  final Cages? cages;
+  final Cages? product;
   final String? id;
-  const CagesDetailScreen({super.key, this.cages, this.id});
+  const CagesDetailScreen({Key? key, this.product, this.id}) : super(key: key);
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _CagesDetailScreenState();
+  ConsumerState<CagesDetailScreen> createState() => _CagesDetailScreenState();
 }
 
 class _CagesDetailScreenState extends ConsumerState<CagesDetailScreen> {
-  Cages? cagesFromScan;
+  late Cages products;
+
+  List<Gliders> gliders = [];
+  int itemCount = 1;
 
   @override
   void initState() {
     super.initState();
-    if (widget.id != null) {
-      getCages();
+    if (widget.product != null) {
+      getData();
+    } else {
+      getDataFromScan();
     }
   }
 
-  Future<void> getCages() async {
+  void getData() {
+    products = widget.product!;
+    var iterable = products.gliders!.map((e) => Gliders.fromJson(e)).toList();
+    final List<Gliders> glider = iterable;
+    gliders.addAll(glider);
+  }
+
+  Future<void> getDataFromScan() async {
     final snapshot = await FirebaseFirestore.instance.collection("cages").doc(widget.id).get();
     if (snapshot.exists) {
       final cage = Cages.fromJson(snapshot.data()!);
       setState(() {
-        cagesFromScan = cage;
+        products = cage;
       });
-      Logger().i(cage);
     }
-    Logger().i(cagesFromScan);
+    // TODO: ADD GLIDERS FILTER HERE
   }
 
   @override
   Widget build(BuildContext context) {
     final users = ref.watch(authControllerProvider);
     return Scaffold(
-      extendBodyBehindAppBar: true, // <-- Set this
-      appBar: AppBar(
-        backgroundColor: Colors.transparent, // <-- this
-        shadowColor: Colors.transparent, // <-- and this
-      ),
-      body: widget.id != null
-          ? Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Image(
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  height: 200,
-                  image: NetworkImage(widget.cages?.images.toString() ?? 'https://picsum.photos/500/300?random=1'),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      Text(
-                        cagesFromScan?.title.toString().toUpperCase() ?? 'null',
-                        style: GoogleFonts.poppins(
-                          fontSize: 25,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black,
-                        ),
-                      ),
-                      Text(
-                        'Category ${cagesFromScan?.category}',
-                        style: GoogleFonts.poppins(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black,
-                        ),
-                      ),
-                      Text(
-                        'Jumlah ${cagesFromScan?.gliders?.length} SG',
-                        style: GoogleFonts.poppins(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black,
-                        ),
-                      ),
-                      Text(
-                        'Gliders: \n${cagesFromScan?.gliders?.toString().replaceAll('[', '').replaceAll(']', '')}',
-                        style: GoogleFonts.poppins(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black,
-                        ),
-                      ),
-                      if (cagesFromScan?.notes != '')
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'notes',
-                              style: GoogleFonts.poppins(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black,
-                              ),
-                            ),
-                            Text(
-                              cagesFromScan?.notes.toString() ?? 'null',
-                              style: GoogleFonts.poppins(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w400,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ],
-                        )
-                    ],
-                  ),
-                )
-              ],
-            )
-          : Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Image(
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  height: 200,
-                  image: NetworkImage(widget.cages?.images.toString() ?? 'https://picsum.photos/500/300?random=1'),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      Text(
-                        widget.cages?.title.toString().toUpperCase() ?? 'null',
-                        style: GoogleFonts.poppins(
-                          fontSize: 25,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black,
-                        ),
-                      ),
-                      Text(
-                        'Category ${widget.cages?.category}',
-                        style: GoogleFonts.poppins(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black,
-                        ),
-                      ),
-                      Text(
-                        'Jumlah ${widget.cages?.gliders?.length} SG',
-                        style: GoogleFonts.poppins(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black,
-                        ),
-                      ),
-                      Text(
-                        'Gliders',
-                        style: GoogleFonts.poppins(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.grey,
-                        ),
-                      ),
-
-                      for (var i = 0; i < widget.cages!.gliders!.length; i++)
-                        Text(
-                          widget.cages!.gliders![i].toString(),
-                          style: GoogleFonts.poppins(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.black,
+      backgroundColor: neutral,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(66.h),
+        child: AppBar(
+          primary: true,
+          backgroundColor: whitish,
+          elevation: 0,
+          centerTitle: true,
+          leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Image.asset("assets/icons/arrow-left-icon.png"),
+          ),
+          title: Text(
+            "Detail Cages",
+            style: appBarTitle,
+          ),
+          actions: [
+            IconButton(
+              onPressed: () async {
+                // show qr code
+                final directory = await getApplicationDocumentsDirectory();
+                final path = directory.path;
+                final file = File('$path/qr.png');
+                final imageFile = await file.writeAsBytes(
+                  (await QrPainter(
+                    data: products.id!,
+                    version: QrVersions.auto,
+                    gapless: false,
+                    color: Colors.black,
+                    emptyColor: Colors.white,
+                  ).toImageData(500))!
+                      .buffer
+                      .asUint8List(),
+                );
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: Image.file(imageFile),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              final success = await GallerySaver.saveImage(imageFile.path);
+                              if (!mounted) return;
+                              if (success == true) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text("Berhasil disimpan"),
+                                  ),
+                                );
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text("Gagal disimpan"),
+                                  ),
+                                );
+                              }
+                              Navigator.pop(context);
+                            },
+                            style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                            child: const Text("Save"),
                           ),
                         ),
-                      // Text(
-                      //   widget.cages!.gliders!.map((e) => e['name']).toList().join(', '),
-                      //   style: GoogleFonts.poppins(fontSize: 12),
-                      // ),
-                      // Text(
-                      //   'Gliders: \n${widget.cages?.gliders?.toString().replaceAll('[', '').replaceAll(']', '')}',
-                      //   style: GoogleFonts.poppins(
-                      //     fontSize: 20,
-                      //     fontWeight: FontWeight.w600,
-                      //     color: Colors.black,
-                      //   ),
-                      // ),
-
-                      if (widget.cages?.notes != '')
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'notes',
-                              style: GoogleFonts.poppins(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black,
-                              ),
-                            ),
-                            Text(
-                              widget.cages?.notes.toString() ?? 'null',
-                              style: GoogleFonts.poppins(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w400,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ],
-                        )
+                        // share button
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              await Share.shareXFiles(
+                                [XFile(imageFile.path)],
+                                subject: "QR Code",
+                              );
+                              if (!mounted) return;
+                              Navigator.pop(context);
+                            },
+                            style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+                            child: const Text("Share"),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+              icon: Icon(
+                Icons.qr_code_2_rounded,
+                size: 26,
+                color: black,
+              ),
+            ),
+          ],
+        ),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Image.network(
+              // "https://i.pinimg.com/1200x/da/66/47/da6647f1615e67791fa6644d1a7663fa.jpg",
+              products.images.toString(),
+              width: 1.sw,
+              height: 290.h,
+              fit: BoxFit.cover,
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 18.w),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: 16.h,
+                  ),
+                  Text(
+                    // "Pharma Hemp Chicken Treats",
+                    products.title.toString().toUpperCase(),
+                    style: productItemTitle,
+                  ),
+                  SizedBox(
+                    height: 8.h,
+                  ),
+                  Text(
+                    "${products.gliders!.length} Ekor Gliders",
+                    style: productItemRatingBlackGray,
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(
+              height: 16.h,
+            ),
+            Container(
+              width: 1.sw,
+              height: 1.h,
+              color: gray,
+            ),
+            SizedBox(
+              height: 16.h,
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 18.w),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Description",
+                    style: productDescBigTitle,
+                  ),
+                  SizedBox(
+                    height: 10.h,
+                  ),
+                  Row(
+                    children: [
+                      Text(
+                        "Kategori  ",
+                        style: productDescSubTitleBlack,
+                      ),
+                      Text(
+                        // "Kucing",
+                        products.category.toString(),
+                        style: productDescSubTitlePrimary,
+                      ),
                     ],
                   ),
-                )
-              ],
+                  SizedBox(
+                    height: 12.h,
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Gliders",
+                        style: productDescSubTitleBlack,
+                      ),
+                      ListView.builder(
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: gliders.length,
+                          shrinkWrap: true,
+                          itemBuilder: (context, index) => Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text('${index + 1}\t->\t', style: productDescSubTitlePrimary),
+                                  Text(
+                                    "Jenis ${gliders[index].name}",
+                                    style: productDescSubTitlePrimary,
+                                  ),
+                                  Text(
+                                    "Gender ${gliders[index].gender}",
+                                    style: productDescSubTitlePrimary,
+                                  ),
+                                  Text(
+                                    "${gliders[index].age} Bulan",
+                                    style: productDescSubTitlePrimary,
+                                  ),
+                                ],
+                              )),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 12.h,
+                  ),
+                  Text(
+                    // "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sit faucibus amet nullam cras volutpat. Consectetur dignissim lorem condimentum arcu sit. Ridiculus malesuada dolor ultrices semper erat suscipit eget.",
+                    'Catatan\n${products.notes}',
+                    style: productDescText,
+                  ),
+                  SizedBox(
+                    height: 106.h,
+                  )
+                ],
+              ),
             ),
-
+          ],
+        ),
+      ),
       bottomSheet: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 15),
-        width: double.infinity,
-        height: 60,
-        decoration: BoxDecoration(color: Colors.white, boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.10), offset: const Offset(0, -2), blurRadius: 4, spreadRadius: 0),
+        padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 15.h),
+        width: 1.sw,
+        height: 72.h,
+        decoration: BoxDecoration(color: whitish, boxShadow: [
+          BoxShadow(color: black.withOpacity(0.10), blurRadius: 4, spreadRadius: 0, offset: const Offset(0, -2)),
         ]),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Material(
-              child: InkWell(
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => CagesAddScreen(isEdit: true, cages: widget.cages),
-                      ));
-                },
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.edit,
-                      color: Colors.amber,
-                    ),
-                    const SizedBox(
-                      width: 8,
-                    ),
-                    Text(
-                      'EDIT',
-                      style: btmsheet,
-                    ),
-                  ],
+            ClipRRect(
+              borderRadius: BorderRadius.circular(4.r),
+              child: SizedBox(
+                width: 154.w,
+                height: 42.h,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => CagesAddScreen(isEdit: true, cages: widget.product),
+                        ));
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orangeAccent,
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.edit,
+                        color: Colors.white,
+                      ),
+                      SizedBox(
+                        width: 6.w,
+                      ),
+                      Text(
+                        "Edit",
+                        style: productKeranjang,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-            Container(
-              width: 1,
-              height: double.infinity,
-              color: Colors.black,
-            ),
-            Material(
-              child: InkWell(
-                onTap: () {
-                  showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          title: const Text('Delete cages'),
-                          content: const Text('Are you sure you want to delete this cages?'),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: const Text('Cancel'),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                ref.read(cagesControllerProvider.notifier).delete(widget.cages!.id.toString(),
-                                    title: widget.cages!.title.toString(),
-                                    name: users.name.toString(),
-                                    photo: users.photo.toString());
-                                Navigator.pop(context);
-                                Navigator.pop(context);
-                              },
-                              child: const Text('Delete'),
-                            ),
-                          ],
-                        );
-                      });
-                },
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      'DELETE',
-                      style: btmsheet,
-                    ),
-                    const SizedBox(
-                      width: 8,
-                    ),
-                    const Icon(
-                      Icons.delete_forever,
-                      color: Colors.red,
-                    ),
-                  ],
+            ClipRRect(
+              borderRadius: BorderRadius.circular(4.r),
+              child: SizedBox(
+                width: 154.w,
+                height: 42.h,
+                child: ElevatedButton(
+                  onPressed: () {
+                    showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: const Text('Delete cages'),
+                            content: const Text('Are you sure you want to delete this cages?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: const Text('Cancel'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  ref.read(cagesControllerProvider.notifier).delete(widget.product!.id.toString(),
+                                      title: widget.product!.title.toString(),
+                                      name: users.name.toString(),
+                                      photo: users.photo.toString());
+                                  Navigator.pop(context);
+                                  Navigator.pop(context);
+                                },
+                                child: const Text('Delete'),
+                              ),
+                            ],
+                          );
+                        });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.redAccent,
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.delete_forever_rounded,
+                        color: Colors.white,
+                      ),
+                      SizedBox(
+                        width: 6.w,
+                      ),
+                      Text(
+                        "Delete",
+                        style: productKeranjang,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

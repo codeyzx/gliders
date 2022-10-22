@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:gliders/src/features/auth/presentation/auth_controller.dart';
 import 'package:gliders/src/features/cages/presentation/cages_add_screen.dart';
-import 'package:gliders/src/features/cages/presentation/cages_detail_screen.dart';
 import 'package:gliders/src/features/cages/domain/cages/cages.dart';
-import 'package:gliders/src/features/cages/presentation/cages_detail_screens.dart';
+import 'package:gliders/src/features/cages/presentation/cages_detail_screen.dart';
 import 'package:gliders/src/features/home/presentation/cages_controller.dart';
 import 'package:gliders/src/shared/theme.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -249,7 +247,7 @@ class _CagesScreenState extends ConsumerState<CagesScreen> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => CagesDetailScreens(product: cages[index]),
+                        builder: (context) => CagesDetailScreen(product: cages[index]),
                       ));
                 },
                 child: Card(
@@ -401,6 +399,10 @@ class _CagesScreenState extends ConsumerState<CagesScreen> {
             //     ),
             //   ),
             // ),
+
+            const SizedBox(
+              height: 20,
+            ),
           ],
         ),
       ),

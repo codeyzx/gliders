@@ -1,8 +1,10 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gliders/src/features/cages/domain/cages/cages.dart';
 import 'package:gliders/src/features/history/domain/history.dart';
-import 'package:logger/logger.dart';
 
 class CagesController extends StateNotifier<List<Cages>> {
   CagesController() : super(const []);
@@ -11,7 +13,6 @@ class CagesController extends StateNotifier<List<Cages>> {
   int koloniLength = 0;
   int soloLength = 0;
   int ipLength = 0;
-  int othersLength = 0;
   int glidersLength = 0;
   int glidersJantanLength = 0;
   int glidersBetinaLength = 0;
@@ -29,6 +30,11 @@ class CagesController extends StateNotifier<List<Cages>> {
         fromFirestore: (snapshot, _) => History.fromJson(snapshot.data()!),
         toFirestore: (History history, _) => history.toJson(),
       );
+
+  Future<String> uploadImages(String imagesPath) async {
+    final value = await FirebaseStorage.instance.ref().child('cages/${DateTime.now()}.png').putFile(File(imagesPath));
+    return value.ref.getDownloadURL();
+  }
 
   Future<void> add({
     required String title,
@@ -128,7 +134,6 @@ class CagesController extends StateNotifier<List<Cages>> {
     final koloni = cages.where((e) => e.category == 'koloni').toList().length;
     final solo = cages.where((e) => e.category == 'solo').toList().length;
     final ip = cages.where((e) => e.category == 'ip').toList().length;
-    final others = cages.where((e) => e.category == 'others').toList().length;
 
     final gliders = cages.map((e) => e.gliders).toList();
     final glidersTotal = gliders.map((e) => e!.length).toList();
@@ -162,7 +167,6 @@ class CagesController extends StateNotifier<List<Cages>> {
     koloniLength = koloni;
     soloLength = solo;
     ipLength = ip;
-    othersLength = others;
     glidersLength = glidersLengthTemp;
     glidersJantanLength = glidersJantanLengthTemp;
     glidersBetinaLength = glidersBetinaLengthTemp;

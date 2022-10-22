@@ -190,7 +190,7 @@ class ChartBarState extends State<ChartBar> {
               ),
               children: <TextSpan>[
                 TextSpan(
-                  text: (rod.toY - 1).toString(),
+                  text: '${rod.toY.toInt() - 1} Ekor',
                   style: const TextStyle(
                     color: Colors.yellow,
                     fontSize: 16,

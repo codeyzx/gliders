@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gliders/src/features/auth/presentation/auth_controller.dart';
 import 'package:gliders/src/features/auth/presentation/sign_in_screen.dart';
-import 'package:gliders/src/features/cages/presentation/cages_detail_screens.dart';
+import 'package:gliders/src/features/cages/presentation/cages_detail_screen.dart';
 import 'package:gliders/src/features/cages/presentation/cages_screen.dart';
+import 'package:gliders/src/features/history/domain/history.dart';
 import 'package:gliders/src/features/history/presentation/history_controller.dart';
 import 'package:gliders/src/features/history/presentation/history_screen.dart';
 import 'package:gliders/src/features/home/presentation/cages_controller.dart';
@@ -12,7 +13,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:intl/intl.dart';
 import 'package:just_the_tooltip/just_the_tooltip.dart';
-import 'package:logger/logger.dart';
 import 'package:go_router/go_router.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -25,6 +25,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   int length = 0;
+  List<History> history = [];
 
   @override
   void initState() {
@@ -32,27 +33,34 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     initProducts();
   }
 
-  Future<void> initProducts() async {
+  Future<void> refresh() async {
     await ref.read(cagesControllerProvider.notifier).getData();
     await ref.read(historyControllerProvider.notifier).getData();
+  }
+
+  Future<void> initProducts() async {
+    await refresh();
+
+    final historyTemp = ref.read(historyControllerProvider);
+    setState(() {
+      history.addAll(historyTemp);
+      history.sort((a, b) => b.time!.compareTo(a.time!));
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final users = ref.watch(authControllerProvider);
     final cages = ref.watch(cagesControllerProvider);
-    final history = ref.watch(historyControllerProvider);
 
     final koloniLength = ref.read(cagesControllerProvider.notifier).koloniLength;
     final soloLength = ref.read(cagesControllerProvider.notifier).soloLength;
     final ipLength = ref.read(cagesControllerProvider.notifier).ipLength;
-    final othersLength = ref.read(cagesControllerProvider.notifier).othersLength;
     final totalLength = ref.read(cagesControllerProvider.notifier).cagesLength;
 
     final koloniPercentage = (koloniLength / totalLength * 100).toStringAsFixed(0);
     final soloPercentage = (soloLength / totalLength * 100).toStringAsFixed(0);
     final ipPercentage = (ipLength / totalLength * 100).toStringAsFixed(0);
-    final othersPercentage = (othersLength / totalLength * 100).toStringAsFixed(0);
 
     String checkTime() {
       final now = DateTime.now();
@@ -74,16 +82,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async {
-            await ref.read(cagesControllerProvider.notifier).getData();
+            await refresh();
           },
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                //
-                //Header
-                //
                 Container(
                   width: double.infinity,
                   height: 80,
@@ -95,7 +100,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         Material(
                           child: InkWell(
                             onTap: () async {
-                              //show dialog to confirm logout
                               await showDialog(
                                 context: context,
                                 builder: (context) => AlertDialog(
@@ -126,9 +130,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               height: 50,
                               decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  //
-                                  //User Photo
-                                  //
                                   image: DecorationImage(
                                     image: NetworkImage(
                                       users.photo.toString(),
@@ -141,9 +142,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            //
-                            //Lokasi User
-                            //
                             Text(
                               checkTime(),
                               style: GoogleFonts.poppins(
@@ -162,19 +160,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             )
                           ],
                         ),
-                        //
-                        //Badge Notifikasi
-                        //
                         const Spacer(),
                         InkWell(
-                          onTap: () {
-                            final gliders = cages.map((e) => e.gliders).toList();
-
-                            final glidersBetina =
-                                gliders.map((e) => e!.where((element) => element.containsValue('betina')).length).toList();
-                            final glidersBetinaLength = glidersBetina.reduce((value, element) => value + element);
-                            Logger().e(glidersBetinaLength);
-                          },
+                          onTap: () {},
                           child: const SizedBox(
                             width: 32.0,
                             child: Icon(
@@ -191,68 +179,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
                 const SizedBox(height: 20),
                 ChartCages(
-                    koloniLength: koloniLength.toDouble(),
-                    soloLength: soloLength.toDouble(),
-                    totalLength: totalLength.toDouble(),
-                    ipLength: ipLength.toDouble(),
-                    othersLength: othersLength.toDouble(),
-                    koloniPercentage: koloniPercentage,
-                    soloPercentage: soloPercentage,
-                    ipPercentage: ipPercentage,
-                    othersPercentage: othersPercentage),
+                  koloniLength: koloniLength.toDouble(),
+                  soloLength: soloLength.toDouble(),
+                  totalLength: totalLength.toDouble(),
+                  ipLength: ipLength.toDouble(),
+                  koloniPercentage: koloniPercentage,
+                  soloPercentage: soloPercentage,
+                  ipPercentage: ipPercentage,
+                ),
                 const SizedBox(height: 10),
-                //
-                //Card suggest
-                //
-                // Row(
-                //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                //   children: List.generate(
-                //     menus.length,
-                //     (index) {
-                //       var item = menus[index];
-                //       return Column(
-                //         children: [
-                //           Container(
-                //             height: 60,
-                //             width: 60,
-                //             decoration: BoxDecoration(
-                //               color: Colors.blueAccent.withOpacity(0.2),
-                //               borderRadius: BorderRadius.circular(12),
-                //             ),
-                //             child: Stack(
-                //               children: [
-                //                 Padding(
-                //                   padding: const EdgeInsets.all(10.0),
-                //                   child: Image.network(item["icon"]),
-                //                 ),
-                //                 Material(
-                //                   color: Colors.transparent,
-                //                   borderRadius: BorderRadius.circular(60),
-                //                   child: InkWell(
-                //                     onTap: () {
-                //                       Navigator.push(
-                //                           context,
-                //                           MaterialPageRoute(
-                //                             builder: (context) => const BarcodescanScreen(),
-                //                           ));
-                //                     },
-                //                     borderRadius: BorderRadius.circular(60),
-                //                   ),
-                //                 ),
-                //               ],
-                //             ),
-                //           ),
-                //           const SizedBox(height: 5),
-                //           Text(item["label"]),
-                //         ],
-                //       );
-                //     },
-                //   ),
-                // ),
-                // const SizedBox(height: 30),
-                // //
-                //Card Popular Nearby
-                //
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -297,103 +232,87 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         scrollDirection: Axis.horizontal,
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: cages
-                              .map(
-                                (item) => InkWell(
-                                  onTap: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => CagesDetailScreens(product: item),
-                                        ));
-                                  },
-                                  child: Card(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(15.0),
-                                    ),
-                                    child: IntrinsicHeight(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Container(
-                                            width: 200,
-                                            height: 150,
-                                            decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.circular(15),
-                                              image: DecorationImage(
-                                                image: NetworkImage(
-                                                  item.images.toString(),
-                                                ),
-                                                fit: BoxFit.cover,
+                          children: List.generate(
+                            cages.length,
+                            (index) => Visibility(
+                              visible: index < 5,
+                              child: InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => CagesDetailScreen(product: cages[index]),
+                                      ));
+                                },
+                                child: Card(
+                                  margin: const EdgeInsets.only(right: 20),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15.0),
+                                  ),
+                                  child: IntrinsicHeight(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          width: 200,
+                                          height: 150,
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(15),
+                                            image: DecorationImage(
+                                              image: NetworkImage(
+                                                cages[index].images.toString(),
                                               ),
+                                              fit: BoxFit.cover,
                                             ),
                                           ),
-                                          Padding(
-                                            padding: const EdgeInsets.all(12.0),
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  item.title.toString().toUpperCase(),
-                                                  style: GoogleFonts.poppins(
-                                                    fontSize: 18,
-                                                    fontWeight: FontWeight.w600,
-                                                  ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.all(12.0),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                cages[index].title.toString().toUpperCase(),
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w600,
                                                 ),
-                                                const SizedBox(height: 5),
-                                                Row(
-                                                  children: [
-                                                    const Icon(
-                                                      Icons.category,
-                                                      size: 15,
+                                              ),
+                                              const SizedBox(height: 5),
+                                              Row(
+                                                children: [
+                                                  const Icon(
+                                                    Icons.category,
+                                                    size: 15,
+                                                    color: Colors.grey,
+                                                  ),
+                                                  const SizedBox(width: 5),
+                                                  Text(
+                                                    cages[index].category.toString(),
+                                                    style: GoogleFonts.poppins(
+                                                      fontSize: 12,
+                                                      fontWeight: FontWeight.w400,
                                                       color: Colors.grey,
                                                     ),
-                                                    const SizedBox(width: 5),
-                                                    Text(
-                                                      item.category.toString(),
-                                                      style: GoogleFonts.poppins(
-                                                        fontSize: 12,
-                                                        fontWeight: FontWeight.w400,
-                                                        color: Colors.grey,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                const SizedBox(height: 8),
-                                                // Text(item.gliders!.join(", "), style: GoogleFonts.poppins(fontSize: 12)),
-                                                Text(
-                                                  item.gliders!.map((e) => e['name']).toList().join(', '),
-                                                  style: GoogleFonts.poppins(fontSize: 12),
-                                                  overflow: TextOverflow.ellipsis,
-                                                ),
-                                                // Row(
-                                                //   children: item.gliders!.map((e) {
-                                                //     // get values of name
-                                                //     var name = e["name"];
-                                                //     return Row(
-                                                //       children: [
-                                                //         Text(
-                                                //           name.toString(),
-                                                //           style: GoogleFonts.poppins(
-                                                //             fontSize: 12,
-                                                //             fontWeight: FontWeight.w400,
-                                                //           ),
-                                                //         ),
-                                                //         const SizedBox(width: 5),
-                                                //       ],
-                                                //     );
-                                                //   }).toList(),
-                                                // )
-                                              ],
-                                            ),
-                                          )
-                                        ],
-                                      ),
+                                                  ),
+                                                ],
+                                              ),
+                                              const SizedBox(height: 8),
+                                              Text(
+                                                cages[index].gliders!.map((e) => e['name']).toList().join(', '),
+                                                style: GoogleFonts.poppins(fontSize: 12),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ],
+                                          ),
+                                        )
+                                      ],
                                     ),
                                   ),
                                 ),
-                              )
-                              .toList(),
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -527,95 +446,104 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                     const SizedBox(height: 10),
                     Padding(
-                        padding: const EdgeInsets.only(
-                          left: 20.0,
-                          right: 20.0,
-                          bottom: 10.0,
-                        ),
-                        child: ListView.builder(
-                          physics: const NeverScrollableScrollPhysics(),
-                          shrinkWrap: true,
-                          itemCount: history.length,
-                          itemBuilder: (context, index) {
-                            if (index < 4) {
-                              return Container(
-                                margin: const EdgeInsets.only(bottom: 20),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(15),
-                                  color: Colors.white,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(0.2),
-                                      spreadRadius: 1,
-                                      blurRadius: 4,
-                                      offset: const Offset(0, 3), // changes position of shadow
+                      padding: const EdgeInsets.only(
+                        left: 20.0,
+                        right: 20.0,
+                        bottom: 10.0,
+                      ),
+                      child: ListView.builder(
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: history.length,
+                        itemBuilder: (context, index) {
+                          if (index < 4) {
+                            return Container(
+                              margin: const EdgeInsets.only(bottom: 20),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(15),
+                                color: Colors.white,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.2),
+                                    spreadRadius: 1,
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 3),
+                                  ),
+                                ],
+                              ),
+                              child: InkWell(
+                                onTap: () {},
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Container(
+                                          width: 50,
+                                          height: 50,
+                                          margin: const EdgeInsets.symmetric(horizontal: 10),
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(15),
+                                            image: DecorationImage(
+                                              image: NetworkImage(
+                                                history[index].photo.toString(),
+                                              ),
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.all(12.0),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              SizedBox(
+                                                width: 100,
+                                                child: Text(
+                                                  overflow: TextOverflow.fade,
+                                                  history[index].name.toString().toUpperCase(),
+                                                  style: GoogleFonts.poppins(
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                              ),
+                                              Text(
+                                                  DateFormat('dd MMMM, kk:mm').format(DateTime.fromMillisecondsSinceEpoch(
+                                                      int.tryParse(history[index].time.toString())!)),
+                                                  style: GoogleFonts.poppins(fontSize: 12)),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Container(
+                                      margin: const EdgeInsets.only(right: 10),
+                                      padding: const EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                        color: logColors(history[index].log.toString()),
+                                        borderRadius: const BorderRadius.all(Radius.circular(10)),
+                                      ),
+                                      child: SizedBox(
+                                        width: 80,
+                                        child: Center(
+                                          child: Text(
+                                            history[index].cages.toString(),
+                                            style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w300),
+                                          ),
+                                        ),
+                                      ),
                                     ),
                                   ],
                                 ),
-                                child: InkWell(
-                                  onTap: () {},
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Container(
-                                            width: 50,
-                                            height: 50,
-                                            margin: const EdgeInsets.symmetric(horizontal: 10),
-                                            decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.circular(15),
-                                              image: DecorationImage(
-                                                image: NetworkImage(
-                                                  history[index].photo.toString(),
-                                                ),
-                                                fit: BoxFit.cover,
-                                              ),
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.all(12.0),
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                SizedBox(
-                                                  width: 100,
-                                                  child: Text(
-                                                    overflow: TextOverflow.fade,
-                                                    history[index].name.toString().toUpperCase(),
-                                                    style: GoogleFonts.poppins(
-                                                      fontSize: 18,
-                                                      fontWeight: FontWeight.w600,
-                                                    ),
-                                                  ),
-                                                ),
-                                                Text(
-                                                    DateFormat('dd MMMM, kk:mm').format(DateTime.fromMillisecondsSinceEpoch(
-                                                        int.tryParse(history[index].time.toString())!)),
-                                                    style: GoogleFonts.poppins(fontSize: 12)),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      Container(
-                                          margin: const EdgeInsets.only(right: 10),
-                                          padding: const EdgeInsets.all(10),
-                                          decoration: BoxDecoration(
-                                            color: logColors(history[index].log.toString()),
-                                            borderRadius: const BorderRadius.all(Radius.circular(10)),
-                                          ),
-                                          child: Text(history[index].cages.toString(),
-                                              style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w300))),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            } else {
-                              return const SizedBox();
-                            }
-                          },
-                        )),
+                              ),
+                            );
+                          } else {
+                            return const SizedBox();
+                          }
+                        },
+                      ),
+                    ),
                   ],
                 ),
               ],

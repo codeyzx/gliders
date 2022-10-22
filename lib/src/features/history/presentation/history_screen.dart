@@ -29,9 +29,12 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
 
   Future<void> initCages() async {
     final returnCages = ref.read(historyControllerProvider);
+
     setState(() {
       history.addAll(returnCages);
       historyFilter.addAll(returnCages);
+      history.sort((a, b) => b.time!.compareTo(a.time!));
+      historyFilter.sort((a, b) => b.time!.compareTo(a.time!));
     });
   }
 

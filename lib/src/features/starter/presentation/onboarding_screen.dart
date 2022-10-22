@@ -53,13 +53,13 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                   height: 53.24.h,
                 ),
                 Text(
-                  'Save articles with ease',
+                  'Manage gliders with ease',
                   style: onBoardSubTitle,
                 ),
                 SizedBox(
                     width: 256.w,
                     child: Text(
-                      'You can add all your read later article here fast and easy',
+                      'You can add all your gliders here fast and easy',
                       style: onBoardSubTitle,
                       textAlign: TextAlign.center,
                     )),
@@ -80,13 +80,13 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                   height: 50.64.h,
                 ),
                 Text(
-                  'Actually Read Later',
+                  'Just Scan and Go',
                   style: onBoardTitle,
                 ),
                 SizedBox(
                     width: 256.w,
                     child: Text(
-                      'Get a reminder also set your daily goals to make habit',
+                      'Easy to use QR code scanner to edit or delete',
                       style: onBoardSubTitle,
                       textAlign: TextAlign.center,
                     )),
@@ -113,7 +113,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                 SizedBox(
                     width: 256.w,
                     child: Text(
-                      'Know your read statistic easily, built habit from now on',
+                      'Know your gliders statistic easily',
                       style: onBoardSubTitle,
                       textAlign: TextAlign.center,
                     )),

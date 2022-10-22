@@ -7,11 +7,9 @@ class ChartCages extends StatefulWidget {
   final double soloLength;
   final double totalLength;
   final double ipLength;
-  final double othersLength;
   final String koloniPercentage;
   final String soloPercentage;
   final String ipPercentage;
-  final String othersPercentage;
 
   const ChartCages({
     Key? key,
@@ -19,11 +17,9 @@ class ChartCages extends StatefulWidget {
     required this.soloLength,
     required this.totalLength,
     required this.ipLength,
-    required this.othersLength,
     required this.koloniPercentage,
     required this.soloPercentage,
     required this.ipPercentage,
-    required this.othersPercentage,
   }) : super(key: key);
 
   @override
@@ -65,14 +61,13 @@ class ChartCagesState extends State<ChartCages> {
                     sectionsSpace: 0,
                     centerSpaceRadius: 35,
                     sections: showingSections(
-                        koloniPercentage: widget.koloniPercentage,
-                        soloPercentage: widget.soloPercentage,
-                        ipPercentage: widget.ipPercentage,
-                        othersPercentage: widget.othersPercentage,
-                        koloniLength: widget.koloniLength,
-                        soloLength: widget.soloLength,
-                        ipLength: widget.ipLength,
-                        othersLength: widget.othersLength),
+                      koloniPercentage: widget.koloniPercentage,
+                      soloPercentage: widget.soloPercentage,
+                      ipPercentage: widget.ipPercentage,
+                      koloniLength: widget.koloniLength,
+                      soloLength: widget.soloLength,
+                      ipLength: widget.ipLength,
+                    ),
                   ),
                 ),
               ),
@@ -102,14 +97,6 @@ class ChartCagesState extends State<ChartCages> {
                   text: 'IP',
                   isSquare: true,
                 ),
-                SizedBox(
-                  height: 4,
-                ),
-                Indicator(
-                  color: Colors.grey,
-                  text: 'Others',
-                  isSquare: true,
-                ),
               ],
             ),
             const SizedBox(
@@ -121,16 +108,15 @@ class ChartCagesState extends State<ChartCages> {
     );
   }
 
-  List<PieChartSectionData> showingSections(
-      {required String koloniPercentage,
-      required String soloPercentage,
-      required String ipPercentage,
-      required String othersPercentage,
-      required double koloniLength,
-      required double soloLength,
-      required double ipLength,
-      required double othersLength}) {
-    return List.generate(4, (i) {
+  List<PieChartSectionData> showingSections({
+    required String koloniPercentage,
+    required String soloPercentage,
+    required String ipPercentage,
+    required double koloniLength,
+    required double soloLength,
+    required double ipLength,
+  }) {
+    return List.generate(3, (i) {
       final isTouched = i == touchedIndex;
       final fontSize = isTouched ? 25.0 : 16.0;
       final radius = isTouched ? 60.0 : 50.0;
@@ -164,18 +150,6 @@ class ChartCagesState extends State<ChartCages> {
             color: const Color(0xff845bef),
             value: ipLength.toDouble(),
             title: '$ipPercentage%',
-            radius: radius,
-            titleStyle: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xffffffff),
-            ),
-          );
-        case 3:
-          return PieChartSectionData(
-            color: Colors.grey,
-            value: othersLength.toDouble(),
-            title: '$othersPercentage%',
             radius: radius,
             titleStyle: TextStyle(
               fontSize: fontSize,

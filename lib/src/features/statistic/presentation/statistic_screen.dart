@@ -19,7 +19,6 @@ class _StatisticScreenState extends ConsumerState<StatisticScreen> {
     final koloniLength = ref.read(cagesControllerProvider.notifier).koloniLength;
     final soloLength = ref.read(cagesControllerProvider.notifier).soloLength;
     final ipLength = ref.read(cagesControllerProvider.notifier).ipLength;
-    final othersLength = ref.read(cagesControllerProvider.notifier).othersLength;
     final totalLength = ref.read(cagesControllerProvider.notifier).cagesLength;
 
     final glidersLength = ref.read(cagesControllerProvider.notifier).glidersLength;
@@ -34,7 +33,6 @@ class _StatisticScreenState extends ConsumerState<StatisticScreen> {
     final koloniPercentage = (koloniLength / totalLength * 100).toStringAsFixed(0);
     final soloPercentage = (soloLength / totalLength * 100).toStringAsFixed(0);
     final ipPercentage = (ipLength / totalLength * 100).toStringAsFixed(0);
-    final othersPercentage = (othersLength / totalLength * 100).toStringAsFixed(0);
 
     final jantanPercentage = (jantanLength / glidersLength * 100).toStringAsFixed(0);
     final betinaPercentage = (betinaLength / glidersLength * 100).toStringAsFixed(0);
@@ -67,11 +65,9 @@ class _StatisticScreenState extends ConsumerState<StatisticScreen> {
                     soloLength: soloLength.toDouble(),
                     totalLength: totalLength.toDouble(),
                     ipLength: ipLength.toDouble(),
-                    othersLength: othersLength.toDouble(),
                     koloniPercentage: koloniPercentage,
                     soloPercentage: soloPercentage,
                     ipPercentage: ipPercentage,
-                    othersPercentage: othersPercentage,
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 14.0),
@@ -93,10 +89,6 @@ class _StatisticScreenState extends ConsumerState<StatisticScreen> {
                         ),
                         Text(
                           'Total IP $ipLength buah ($ipPercentage%)',
-                          style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w400),
-                        ),
-                        Text(
-                          'Total Others $othersLength buah ($othersPercentage%)',
                           style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w400),
                         ),
                       ],

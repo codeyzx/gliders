@@ -32,6 +32,23 @@ class _BotNavBarScreenState extends ConsumerState<BotNavBarScreen> {
           bucket: bucket,
           child: currentScreen,
         ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButton: Container(
+          height: 70,
+          width: 70,
+          margin: const EdgeInsets.only(top: 20),
+          child: FloatingActionButton(
+            backgroundColor: Colors.blueAccent,
+            onPressed: () {
+              showDialog(context: context, builder: (context) => const BarcodescanScreen());
+            },
+            elevation: 0,
+            child: const Icon(
+              Icons.qr_code_scanner,
+              size: 40,
+            ),
+          ),
+        ),
         bottomNavigationBar: Theme(
           data: ThemeData(
             canvasColor: Colors.white,
@@ -70,7 +87,7 @@ class _BotNavBarScreenState extends ConsumerState<BotNavBarScreen> {
                         ref.read(currentScreenProvider.state).state = const HomeScreen();
                         break;
                       case 1:
-                        showDialog(context: context, builder: (context) => const BarcodescanScreen());
+                        // showDialog(context: context, builder: (context) => const BarcodescanScreen());
                         // Navigator.push(
                         //     context,
                         //     MaterialPageRoute(
@@ -91,13 +108,7 @@ class _BotNavBarScreenState extends ConsumerState<BotNavBarScreen> {
                     ),
                     label: 'Home',
                   ),
-                  BottomNavigationBarItem(
-                    icon: Padding(
-                      padding: EdgeInsets.only(top: 8.0.h),
-                      child: const Icon(Icons.qr_code_scanner_rounded),
-                    ),
-                    label: 'Scan',
-                  ),
+                  BottomNavigationBarItem(icon: Container(), label: ''),
                   BottomNavigationBarItem(
                     icon: Padding(
                       padding: EdgeInsets.only(top: 8.0.h),
