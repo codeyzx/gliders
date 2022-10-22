@@ -1,9 +1,7 @@
 name: CD
 
 on:
-  create:
-    branches:
-      - main
+  push:
     tags:
       - "v*.*.*"
 jobs:
@@ -32,5 +30,8 @@ jobs:
 
       - name: Create Github Release
         uses: ncipollo/release-action@v1
+
         with:
           artifacts: "build/app/outputs/apk/release/*.apk,build/app/outputs/bundle/release/*.aab"
+          commit: main
+          tag: v1.0.${{ github.run_number }}
