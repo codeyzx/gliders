@@ -5,9 +5,8 @@ name: CD
 # events but only for the master branch
 on:
   push:
-    branches: main
     tags:
-      - "v*.*.*" # on every version tag will build a new android artifact.
+      - "*" # on every version tag will build a new android artifact.
 jobs:
   build:
     name: Build APK
@@ -42,4 +41,4 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           artifacts: "build/app/outputs/apk/release/*.apk,build/app/outputs/bundle/release/*.aab"
-          commit: main
+        
