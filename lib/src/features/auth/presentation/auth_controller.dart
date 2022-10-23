@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gliders/src/features/home/presentation/botnavbar_screen.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -49,6 +49,11 @@ class AuthController extends StateNotifier<Users> {
       }
     } catch (e) {
       Logger().e(e);
+
+      showDialog(
+        context: context,
+        builder: (context) => SnackBar(content: Text('Something error!\nerror: $e')),
+      );
     }
   }
 
@@ -60,6 +65,7 @@ class AuthController extends StateNotifier<Users> {
     );
 
     await googleSignIn.signOut();
+    await FirebaseAuth.instance.signOut();
 
     state = const Users();
   }
