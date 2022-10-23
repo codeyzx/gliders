@@ -29,14 +29,14 @@ jobs:
           KEY_JKS: ${{ secrets.KEY_JKS }}
           KEY_PASSWORD: ${{ secrets.ALIAS_PASSWORD }}
           ALIAS_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: echo $KEY_JKS > upload-keystore.jks && flutter build apk --split-per-abi --release
+        run: echo $KEY_JKS > android/upload-keystore.jks && flutter build apk --split-per-abi --release
 
       - name: Build APPBUNDLE
         env:
           KEY_JKS: ${{ secrets.KEY_JKS }}
           KEY_PASSWORD: ${{ secrets.ALIAS_PASSWORD }}
           ALIAS_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: echo $KEY_JKS > upload-keystore.jks && flutter build appbundle --release
+        run: echo $KEY_JKS > android/upload-keystore.jks && flutter build appbundle --release
 
       - name: Create Github Release
         uses: ncipollo/release-action@v1
