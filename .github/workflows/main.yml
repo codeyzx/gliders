@@ -25,14 +25,22 @@ jobs:
         run: flutter pub get
 
       - name: Build APK
+        env:
+          KEY_JKS: ${{ secrets.KEY_JKS }}
+          KEY_PASSWORD: ${{ secrets.ALIAS_PASSWORD }}
+          ALIAS_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: flutter build apk --split-per-abi --release
 
       - name: Build APPBUNDLE
+        env:
+          KEY_JKS: ${{ secrets.KEY_JKS }}
+          KEY_PASSWORD: ${{ secrets.ALIAS_PASSWORD }}
+          ALIAS_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: flutter build appbundle --release
 
       - name: Create Github Release
         uses: ncipollo/release-action@v1
 
         with:
-          artifacts: "build/app/outputs/apk/release/*.apk,build/app/outputs/bundle/release/*.aab"          
+          artifacts: "build/app/outputs/apk/release/*.apk,build/app/outputs/bundle/release/*.aab"
           tag: v1.0.${{ github.run_number }}
