@@ -154,12 +154,13 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                         child: OutlinedButton(
                           onPressed: () async {
                             try {
-                              await ref.read(authControllerProvider.notifier).googleSignIn();
-                              if (mounted) {
-                                context.goNamed(BotNavBarScreen.routeName);
-                              }
+                              await ref.read(authControllerProvider.notifier).googleSignIn(context);
                             } catch (e) {
                               Logger().e(e);
+                              showDialog(
+                                context: context,
+                                builder: (context) => SnackBar(content: Text('Something error!\nerror: $e')),
+                              );
                             }
                           },
                           style: OutlinedButton.styleFrom(

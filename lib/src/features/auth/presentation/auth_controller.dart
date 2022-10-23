@@ -1,14 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gliders/src/features/home/presentation/botnavbar_screen.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:logger/logger.dart';
 import 'package:gliders/src/features/auth/domain/users.dart';
+import 'package:go_router/go_router.dart';
 
 class AuthController extends StateNotifier<Users> {
   AuthController() : super(const Users());
 
-  Future<void> googleSignIn() async {
+  Future<void> googleSignIn(BuildContext context) async {
     try {
       GoogleSignIn googleSignIn = GoogleSignIn(
         scopes: [
@@ -41,6 +44,8 @@ class AuthController extends StateNotifier<Users> {
           final users = Users.fromJson(checkUsers.data()!);
           state = users;
         }
+        if (!mounted) return;
+        context.goNamed(BotNavBarScreen.routeName);
       }
     } catch (e) {
       Logger().e(e);
