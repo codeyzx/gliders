@@ -30,9 +30,12 @@ https://github.com/codeyzx/gliders.git
 
 ## Demo
 
-|cages|history|qr|statistic|
-|--|--|--|--|
-|![](demo/cages.gif)|![](demo/history.gif)|![](demo/qr.gif)|![](demo/statistic.gif)|
+|cages|history|
+|--|--|
+|![](demo/cages.gif)|![](demo/history.gif)|
+|qr|statistic|
+|--|--|
+|![](demo/qr.gif)|![](demo/statistic.gif)|
 
 ## Features
 - Splash
